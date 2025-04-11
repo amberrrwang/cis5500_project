@@ -16,6 +16,10 @@ app.get('/', (req, res) => {
 const exampleRoutes = require('./routes/example');
 app.use('/example', exampleRoutes);
 
+const userAuth = require('./routes/user_auth');
+app.post('/signup', userAuth.signup);
+app.post('/login', userAuth.login);
+
 const HOST = process.env.SERVER_HOST || 'localhost';
 const PORT = process.env.SERVER_PORT || 5000;
 
