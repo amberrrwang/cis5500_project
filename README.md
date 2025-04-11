@@ -23,6 +23,76 @@ BookVerse mainly uses three datasets:
    - Detailed metadata for 212,404 books
    - Contains: book_title, book_description, book_authors, book_image, book_categories, etc.
 
+## Directory Structure
+
+### 🔷 client/
+Frontend built with React.
+
+```
+client/
+├── public/             
+├── src/                  
+│   ├── _tests_/          # Central location for client tests (extra credit)
+│   ├── components/       # Reusable UI components (e.g., Header, Button)
+│   ├── helpers/          # Utility/helper functions
+│   ├── pages/            # Route-level React views (e.g., ExamplePage)
+│   ├── App.js            # App layout with routing
+│   └── index.js          # React entry point for rendering
+├── .env                  
+└── package.json         
+```
+
+### 🔷 server/
+Backend built with Node.js + Express + PostgreSQL.
+
+```
+server/
+├── _tests_/              # Jest tests (extra credit)
+├── controllers/          # Route handler logic for API endpoints
+├── db/                   
+│   └── queries/          # Modular SQL query definitions
+├── routes/               # API route definitions (e.g., /example)
+├── .env                  # Duplicate .env.example with your credentials
+└── package.json          # Backend dependencies and scripts
+```
+## Getting Started
+
+### In the server folder:
+```bash
+cd server
+npm install
+```
+
+### In the client folder:
+```bash
+cd ../client
+npm install
+```
+
+---
+
+## Running the App Locally
+
+### 1. Start the backend server
+```bash
+cd server
+npm start
+```
+
+This runs the Express server on `http://localhost:8080`.
+
+### 2. Start the frontend (React)
+```bash
+cd ../client
+npm start
+```
+
+This runs the React frontend on `http://localhost:3000`.
+
+The React app will proxy API requests to the backend based on `REACT_APP_API_URL`.
+
+---
+
 ## Features
 
 1. **Search System**: Multi-parameter search across books by title, author, genre, publication date, and rating
