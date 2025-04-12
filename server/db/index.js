@@ -1,13 +1,13 @@
 const { Pool } = require('pg');
-require('dotenv').config();
+const config = require('../config.json')
 
 // Create a connection pool
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  user: config.rds_user,
+  host: config.rds_host,
+  database: config.rds_db,
+  password: config.rds_password,
+  port: config.rds_port,
   ssl: {
     rejectUnauthorized: false // need to set this for security extra credit
   }
