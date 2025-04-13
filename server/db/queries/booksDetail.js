@@ -1,21 +1,53 @@
 const db = require('../index');
 
 async function getBookMetaDataByTitle(identifier) {
-  const query = `SELECT title FROM public.books_metadata WHERE title ILIKE $1 LIMIT 1`;
-  const result = await db.query(query,[`%${identifier}%`]);
+  const query = `
+    SELECT *
+    FROM public.books_metadata
+    WHERE title ILIKE $1
+    LIMIT 1
+  `;
+  const result = await db.query(query, [`%${identifier}%`]);
   return result.rows[0];
 }
 
+
 async function getBookByTitle(title) {
-  const query = `SELECT * FROM isbndb_books ib LEFT JOIN books_metadata bm ON ib.title = bm.title WHERE ib.title = $1 LIMIT 1`;
+  const query = `
+    SELECT ib.isbn, ib.isbn13, ib.language, ib.date_published,
+           bm.*
+    FROM public.isbndb_books ib
+    JOIN public.books_metadata bm ON ib.title = bm.title
+    WHERE ib.title = $1
+    LIMIT 1
+  `;
   const result = await db.query(query, [title]);
   return result.rows[0];
 }
 
+
 async function getBookByISBN(isbn) {
-  const query =  `SELECT * FROM isbndb_books ib LEFT JOIN books_metadata bm ON ib.title = bm.title WHERE ib.isbn = $1 LIMIT 1`;
+  const query = `
+    SELECT ib.isbn, ib.isbn13, ib.language, ib.date_published,
+           bm.*
+    FROM public.isbndb_books ib
+    LEFT JOIN public.books_metadata bm ON ib.title = bm.title
+    WHERE ib.isbn = $1
+    LIMIT 1
+  `;
   const result = await db.query(query, [isbn]);
   return result.rows[0];
+}
+
+async function getISBNByTitle(title) {
+  const query = `
+    SELECT isbn
+    FROM public.isbndb_books
+    WHERE title = $1
+    LIMIT 1
+  `;
+  const result = await db.query(query, [title]);
+  return result.rows[0]?.isbn || null;
 }
 
 
@@ -53,6 +85,7 @@ module.exports = {
   getBookMetaDataByTitle,
   getBookByTitle,
   getBookByISBN,
+  getISBNByTitle,
   getAuthorsByIsbn,
   getCategoriesByTitle,
   getReviewsByTitle,

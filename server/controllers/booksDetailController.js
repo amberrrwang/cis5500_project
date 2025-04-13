@@ -21,14 +21,22 @@ exports.getBookByIdentifier = async (req, res) => {
 };
 
 async function getBookByIdentifier(identifier) {
-  //Try finding a title match in books_metadata
-  const matchedMeta = await bookService.getBookMetaDataByTitle(identifier);
-  if (matchedMeta) {
-    // Found a matching title
-    return await bookService.getBookByTitle(matchedMeta.title);
+  // Helper: simple ISBN check (10 or 13 digits, all numeric)
+  const isISBN = /^\d{10}(\d{3})?$/.test(identifier);
+
+  if (isISBN) {
+    // Skip metadata, go straight to ISBN lookup
+    return await bookService.getBookByISBN(identifier);
   }
 
-  // Step 2: Fall back to searching by ISBN
+  // Try fuzzy title match in books_metadata
+  const matchedMeta = await bookService.getBookMetaDataByTitle(identifier);
+  if (matchedMeta) {
+    const isbn = await bookService.getISBNByTitle(matchedMeta.title);
+    return { ...matchedMeta, isbn: isbn || null };
+  }
+
+  // Final fallback: attempt ISBN match anyway in case title match failed
   return await bookService.getBookByISBN(identifier);
 }
 
