@@ -16,6 +16,10 @@ app.get('/', (req, res) => {
 const exampleRoutes = require('./routes/example');
 app.use('/example', exampleRoutes);
 
+const booksRouter = require('./routes/booksDetail');
+app.use('/books', booksRouter);
+
+
 const HOST = process.env.SERVER_HOST || 'localhost';
 const PORT = process.env.SERVER_PORT || 5000;
 
