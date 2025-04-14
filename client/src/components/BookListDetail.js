@@ -1,0 +1,206 @@
+import React, { useEffect, useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import axios from 'axios';
+import {
+  Box, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemButton,
+  IconButton, Typography, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions
+} from '@mui/material';
+import { FixedSizeList } from 'react-window';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+
+const DEFAULT_IMAGE = 'https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg';
+
+export default function BookListDetail({ listId }) {
+  const [bookList, setBookList] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [showEdit, setShowEdit] = useState(false);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newBook, setNewBook] = useState({ title: '', authors: '' });
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    axios.get(`http://localhost:8080/booklists/${listId}`)
+      .then(res => setBookList(res.data))
+      .catch(err => {
+        console.error('Error fetching list:', err);
+        setError('Failed to load the book list. Please try again later.');
+      });
+  }, [listId]);
+
+  const handleDelete = (title) => {
+    axios.delete(`http://localhost:8080/booklists/${listId}/books/${encodeURIComponent(title)}`)
+      .then(() => {
+        setBookList(prev => ({
+          ...prev,
+          books: prev.books.filter(book => book.title !== title)
+        }));
+      })
+      .catch(err => {
+        console.error('Error deleting book:', err);
+        setError('Failed to delete the book. Please try again.');
+      });
+  };
+
+  const handleAddBook = () => {
+    axios.post(`http://localhost:8080/booklists/${listId}/books`, newBook)
+      .then(() => {
+        setBookList(prev => ({
+          ...prev,
+          books: [...prev.books, newBook]
+        }));
+        setShowAddDialog(false);
+        setNewBook({ title: '', authors: ''});
+      })
+      .catch(err => {
+        console.error('Error adding book:', err);
+        setError('Failed to add the book. Please try again.');
+      });
+  };
+
+  const saveEdit = () => {
+    axios.put(`http://localhost:8080/booklists/${listId}`, { list_name: editName })
+      .then(() => {
+        setBookList(prev => ({ ...prev, list_name: editName }));
+        setShowEdit(false);
+      })
+      .catch(err => {
+        console.error('Error updating list name:', err);
+        setError('Failed to update the list name. Please try again.');
+      });
+  };
+
+  const toggleVisibility = () => {
+    const newStatus = !bookList.is_public;
+    axios.put(`http://localhost:8080/booklists/${listId}`, { is_public: newStatus })
+      .then(() => {
+        setBookList(prev => ({ ...prev, is_public: newStatus }));
+      })
+      .catch(err => {
+        console.error('Error toggling visibility:', err);
+        setError('Failed to change visibility. Please try again.');
+      });
+  };
+
+  if (!bookList) return <div>Loading...</div>;
+
+  const renderRow = ({ index, style }) => {
+    const book = bookList.books[index];
+    return (
+      <ListItem
+        style={style}
+        key={book.title}
+        secondaryAction={
+          <IconButton edge="end" onClick={() => handleDelete(book.title)}>
+            <DeleteIcon />
+          </IconButton>
+        }
+        disablePadding
+        component={RouterLink}
+        to={`/books/${encodeURIComponent(book.title)}`}
+      >
+        <ListItemButton>
+          <ListItemAvatar>
+            <Avatar variant="square" src={book.image || DEFAULT_IMAGE} />
+          </ListItemAvatar>
+          <ListItemText
+            primary={book.title}
+            secondary={
+              <>
+                <Typography component="span" variant="body2" color="text.primary">
+                  {book.authors}
+                </Typography>
+                <br />
+                <Typography component="span" variant="body2" color="text.secondary">
+                  {book.description || 'No description available.'}
+                </Typography>
+              </>
+            }
+          />
+        </ListItemButton>
+      </ListItem>
+    );
+  };
+
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+      <Box sx={{ width: '100%', maxWidth: 600, p: 3, textAlign: 'center' }}>
+        {error && <Typography color="error" gutterBottom>{error}</Typography>}
+
+        {/* List Name + Edit */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
+          <Typography variant="h5" sx={{ mr: 2 }}>{bookList.list_name}</Typography>
+          <Button size="small" onClick={() => {
+            setEditName(bookList.list_name);
+            setShowEdit(true);
+          }}>Edit</Button>
+        </Box>
+
+        {/* Creator + Visibility + Add Button */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Typography variant="subtitle2">
+            Created by {bookList.username} · {bookList.is_public ? 'Public' : 'Private'}
+          </Typography>
+          <Button size="small" variant="outlined" onClick={toggleVisibility}>
+            {bookList.is_public ? 'Make Private' : 'Make Public'}
+          </Button>
+          <Button size="small" variant="contained" startIcon={<AddIcon />} onClick={() => setShowAddDialog(true)}>
+            Add Book
+          </Button>
+        </Box>
+
+        {/* Book List */}
+        <FixedSizeList
+          height={400}
+          width={600}
+          itemSize={72}
+          itemCount={bookList.books.length}
+          overscanCount={5}
+        >
+          {renderRow}
+        </FixedSizeList>
+
+        {/* Edit Dialog */}
+        <Dialog open={showEdit} onClose={() => setShowEdit(false)}>
+          <DialogTitle>Edit List Name</DialogTitle>
+          <DialogContent>
+            <TextField
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              fullWidth
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowEdit(false)}>Cancel</Button>
+            <Button onClick={saveEdit}>Save</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Add Book Dialog */}
+        <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)}>
+          <DialogTitle>Add Book</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Title"
+              fullWidth
+              margin="dense"
+              value={newBook.title}
+              onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
+            />
+            <TextField
+              label="Authors"
+              fullWidth
+              margin="dense"
+              value={newBook.authors}
+              onChange={(e) => setNewBook({ ...newBook, authors: e.target.value })}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
+            <Button onClick={handleAddBook}>Add</Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </Box>
+  );
+}
