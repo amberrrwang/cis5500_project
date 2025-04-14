@@ -1,7 +1,7 @@
 // controllers/bookController.js
 const bookService = require('../db/queries/booksDetail');
 
-exports.getBookByIdentifier = async (req, res) => {
+exports.getBookByIdentifierAPI = async (req, res) => {
   try {
     const { identifier } = req.params;
     const book = await getBookByIdentifier(identifier);
@@ -53,7 +53,7 @@ exports.getBookAuthors = async (req, res) => {
 
 exports.getBookCategories = async (req, res) => {
   try {
-    const book = await bookService.getBookByIdentifier(req.params.isbn);
+    const book = await getBookByIdentifier(req.params.isbn);
     if (!book) return res.status(404).json({ error: 'Book not found' });
 
     const categories = await bookService.getCategoriesByTitle(book.title);
@@ -66,7 +66,7 @@ exports.getBookCategories = async (req, res) => {
 
 exports.getBookReviews = async (req, res) => {
   try {
-    const book = await bookService.getBookByIdentifier(req.params.isbn);
+    const book = await getBookByIdentifier(req.params.isbn);
     if (!book) return res.status(404).json({ error: 'Book not found' });
 
     const reviews = await bookService.getReviewsByTitle(book.title);
