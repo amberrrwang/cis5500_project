@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { handleGetBookCardData, handleGetBookByTitle } = require("../controllers/bookController");
+const {
+  handleGetBookCards,
+  handleGetBookByTitle
+} = require('../controllers/bookController');
 
 // Route to fetch all book cards
 router.get("/", handleGetBookCards); // GET /books
