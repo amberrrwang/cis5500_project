@@ -6,6 +6,8 @@ import { createTheme } from "@mui/material/styles";
 import NavBar from './components/NavBar';
 import ExamplePage from './pages/ExamplePage';
 
+import HomePage from './pages/HomePage';
+
 // createTheme enables you to customize the look and feel of your app past the default
 // in this case, we only change the color scheme
 export const theme = createTheme({
@@ -26,7 +28,9 @@ export default function App() {
       <BrowserRouter>
         <NavBar />
         <Routes>
+          <Route path="/" element={<HomePage />} />
           <Route path="/example" element={<ExamplePage />} />
+          {/* Add more routes as needed */}
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

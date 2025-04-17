@@ -8,6 +8,12 @@ const app = express();
 app.use(cors({
   origin: '*',
 }));
+app.use(express.json());
+
+// Routes
+const homeRoutes = require('./routes/homeRoutes');
+
+app.use('/api/books', homeRoutes);
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello, Express.js Server!</h1>');
