@@ -11,6 +11,8 @@ import BookDetailPage from './pages/BookDetailPage';
 import { useBooks } from './hooks/useBooks'; // adjust path as needed
 import BookCard from './components/BookCard'; // from book-card branch
 
+import HomePage from './pages/HomePage';
+
 // createTheme enables you to customize the look and feel of your app past the default
 // in this case, we only change the color scheme
 export const theme = createTheme({
@@ -46,6 +48,7 @@ export default function App() {
       <Router>
         <NavBar />
         <Routes>
+          <Route path="/" element={<HomePage />} />
           <Route path="/example" element={<ExamplePage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/books/:identifier" element={<BookDetailPage />} />
