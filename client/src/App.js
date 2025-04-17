@@ -4,6 +4,7 @@ import { indigo, amber } from '@mui/material/colors';
 import { createTheme } from "@mui/material/styles";
 import NavBar from './components/NavBar';
 import ExamplePage from './pages/ExamplePage';
+import SearchPage from './pages/SearchPage';
 import BookDetailPage from './pages/BookDetailPage';
 import BookListPage from './pages/BookListPage';
 import BookDetailPage from './pages/BookDetailPage';
@@ -46,7 +47,7 @@ export default function App() {
         <NavBar />
         <Routes>
           <Route path="/example" element={<ExamplePage />} />
-
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/books/:identifier" element={<BookDetailPage />} />
           <Route path="/booklists" element={<BookListPage />} />
           <Route path="/booklists/:id" element={<BookDetailPage />} />
