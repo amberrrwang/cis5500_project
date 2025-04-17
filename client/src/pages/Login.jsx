@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Container, TextField, Button, Typography, Box, Alert, Link as MuiLink } from '@mui/material';
 import axios from 'axios';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-const config = require('../config.json');
 
 const Login = ({ setAuthToken }) => {
   const [email_username, setEmail] = useState('');
@@ -14,7 +13,7 @@ const Login = ({ setAuthToken }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`http://${config.server_host}:${config.server_port}/login`, { email_username, password });
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/login`, { email_username, password });
       localStorage.setItem('authToken', res.data.token);
       setAuthToken(res.data.token);
       // Redirect to the previous page if exists, otherwise default to homepage ('/')

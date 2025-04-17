@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Container, TextField, Button, Typography, Box, Alert, Link as MuiLink  } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-const config = require('../config.json');
 
 const Signup = ({ setAuthToken }) => {
   const [username, setUsername] = useState('');
@@ -23,7 +22,7 @@ const Signup = ({ setAuthToken }) => {
     }
 
     try {
-      const res = await axios.post(`http://${config.server_host}:${config.server_port}/signup`, { username, email, password });
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/signup`, { username, email, password });
       localStorage.setItem('authToken', res.data.token);
       setAuthToken(res.data.token);
       setError(''); // clear any previous errors on successful signup

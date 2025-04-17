@@ -1,11 +1,10 @@
 // ProfilePage.jsx
 import React, { useState, useEffect } from 'react';
 import {
-  Container, Typography, Box, Button, TextField, Avatar, Alert, Grid
+  Container, Typography, Box, Button, Avatar, Alert, Grid
 } from '@mui/material';
 import axios from 'axios';
 import ReadingListCard from '../components/ReadingListCard';
-const config = require('../config.json');
 
 const ProfilePage = ({ token }) => {
   const [user, setUser] = useState(null);
@@ -18,7 +17,7 @@ const ProfilePage = ({ token }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`http://${config.server_host}:${config.server_port}/profile`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(response.data);
@@ -29,7 +28,7 @@ const ProfilePage = ({ token }) => {
 
     const fetchReadingLists = async () => {
       try {
-        const response = await axios.get(`http://${config.server_host}:${config.server_port}/reading-list`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/reading-list`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setReadingLists(response.data);
@@ -60,7 +59,7 @@ const ProfilePage = ({ token }) => {
 
     try {
       const response = await axios.post(
-        `http://${config.server_host}:${config.server_port}/profile/photo/upload`,
+        `${process.env.REACT_APP_API_URL}/profile/photo/upload`,
         formData,
         {
           headers: {
@@ -86,7 +85,7 @@ const ProfilePage = ({ token }) => {
         is_public: false,
       };
       const response = await axios.post(
-        `http://${config.server_host}:${config.server_port}/reading-list`,
+        `${process.env.REACT_APP_API_URL}/reading-list`,
         newList,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -99,7 +98,7 @@ const ProfilePage = ({ token }) => {
   // Delete a reading list.
   const handleDeleteReadingList = async (listId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/reading-list/${listId}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/reading-list/${listId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setReadingLists((prev) => prev.filter((list) => list.list_id !== listId));
