@@ -14,10 +14,19 @@ app.get('/', (req, res) => {
   res.send('<h1>Hello, Express.js Server!</h1>');
 });
 //Here are the routes for the example service, which will be /example/health
+
 const exampleRoutes = require('./routes/example');
 app.use('/example', exampleRoutes);
 const searchRoutes = require('./routes/searchRoutes');
 app.use('/api/books', searchRoutes); // /api/books/search
+
+const exampleRoutes = require('./routes/books');
+app.use("/books", booksRoutes);
+
+const booksRouter = require('./routes/booksDetail');
+app.use('/books', booksRouter);
+
+
 
 const HOST = process.env.SERVER_HOST || 'localhost';
 const PORT = process.env.SERVER_PORT || 5000;
