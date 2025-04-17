@@ -54,7 +54,7 @@ const deleteReadingList = async function (req, res) {
         await pool.query('BEGIN');
 
         // First, delete entries in reading_list_books table associated with this reading list.
-        await client.query(
+        await pool.query(
             `DELETE FROM reading_list_books WHERE list_id = $1`,
             [listId]
         );

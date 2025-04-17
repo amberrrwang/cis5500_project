@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const config = require('./config.json')
 const bodyParser = require('body-parser')
 const {verifyToken} = require("./controllers/tokenVerify");
 require('dotenv').config();
@@ -36,11 +35,11 @@ app.post('/profile/photo/upload', verifyToken, upload.single('profilePhoto'), pr
 const reading = require('./routes/readingList');
 app.get('/reading-list', verifyToken, reading.getReadingList);
 app.post('/reading-list', verifyToken, reading.createReadingList);
-app.delete('/reading-list', verifyToken, reading.deleteReadingList);
+app.delete('/reading-list/:listId', verifyToken, reading.deleteReadingList);
 
 
-const HOST = config.server_host || 'localhost';
-const PORT = config.server_port || 5000;
+const HOST = process.env.server_host || 'localhost';
+const PORT = process.env.server_port || 5000;
 
 app.listen(PORT, HOST, () => {
   console.log(`🚀 Server running at http://${HOST}:${PORT}/`);

@@ -2,7 +2,6 @@ const db = require('../db/index');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {pool} = require('../db/index');
-const config = require('../config.json');
 
 const saltRounds = 10;
 
@@ -23,7 +22,7 @@ const signup = async function (req, res) {
         const { rows } = await pool.query(insertQuery, [username, email, hashedPassword]);
         const user = rows[0];
         
-        const token = jwt.sign({ user_id: user.user_id, email: user.email }, config.jwtSecret, { expiresIn: '1h' });
+        const token = jwt.sign({ user_id: user.user_id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.status(201).json({ token, user });
 
     } catch (error) {
@@ -35,7 +34,6 @@ const signup = async function (req, res) {
 
 const login = async function (req, res) {
     const { email_username, password } = req.body;
-    console.log(email_username, password);
     if (!email_username || !password)
         return res.status(400).json({ message: 'Missing required fields' });
 
@@ -54,7 +52,7 @@ const login = async function (req, res) {
         if (!isMatch)
             return res.status(401).json({ message: 'Invalid credentials' });
 
-        const token = jwt.sign({ user_id: user.user_id, email: user.email }, config.jwtSecret, { expiresIn: '1h' });
+        const token = jwt.sign({ user_id: user.user_id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.json({ token, user: { user_id: user.user_id, username: user.username, email: user.email } });
     } catch (error) {
         console.error('Login error:', error);

@@ -1,4 +1,3 @@
-const config = require('../config.json');
 const {pool} = require('../db/index');
 
 // GET User Profile (protected)
@@ -28,7 +27,7 @@ const updatePhoto = async function (req, res) {
       if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
       
       // Construct URL of the uploaded file
-      const fileUrl = `http://${config.server_host}:${config.server_port}/uploads/${req.file.filename}`;
+      const fileUrl = `http://${process.env.SERVER_HOST}:${process.env.SERVER_PORT}/uploads/${req.file.filename}`;
       
       // Update user profile with the new photo URL.
       const updateQuery = `
