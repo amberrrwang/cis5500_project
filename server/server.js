@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser')
+const {verifyToken} = require("./controllers/tokenVerify");
 require('dotenv').config();
 
 const app = express();
@@ -8,9 +10,10 @@ const app = express();
 app.use(cors({
   origin: '*',
 }));
+
+app.use(bodyParser.json());
+app.use('/uploads', express.static('uploads'));
 app.use(express.json());
-
-
 
 
 app.get('/', (req, res) => {
@@ -33,8 +36,25 @@ app.use('/books', booksRouter);
 const homeRoutes = require('./routes/homeRoutes');
 app.use('/api/books', homeRoutes);
 
-const HOST = process.env.SERVER_HOST || 'localhost';
-const PORT = process.env.SERVER_PORT || 5000;
+// login, sign up
+const userAuth = require('./routes/userAuth');
+app.post('/signup', userAuth.signup);
+app.post('/login', userAuth.login);
+
+//profile
+const profile = require('./routes/profile');
+const {upload} = require('./controllers/upload');
+app.get('/profile', verifyToken, profile.getProfile);
+app.post('/profile/photo/upload', verifyToken, upload.single('profilePhoto'), profile.updatePhoto);
+//reading list
+const reading = require('./routes/readingList');
+app.get('/reading-list', verifyToken, reading.getReadingList);
+app.post('/reading-list', verifyToken, reading.createReadingList);
+app.delete('/reading-list/:listId', verifyToken, reading.deleteReadingList);
+
+
+const HOST = process.env.server_host || 'localhost';
+const PORT = process.env.server_port || 5000;
 
 app.listen(PORT, HOST, () => {
   console.log(`🚀 Server running at http://${HOST}:${PORT}/`);

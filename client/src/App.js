@@ -1,9 +1,18 @@
+
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { indigo, amber } from '@mui/material/colors';
+
 import { createTheme } from "@mui/material/styles";
 import NavBar from './components/NavBar';
 import ExamplePage from './pages/ExamplePage';
+
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ProfilePage from './pages/ProfilePage';
+import RequireAuth from './helpers/RequireAuth';
+
 import SearchPage from './pages/SearchPage';
 import BookDetailPage from './pages/BookDetailPage';
 import BookListPage from './pages/BookListPage';
@@ -12,6 +21,7 @@ import { useBooks } from './hooks/useBooks'; // adjust path as needed
 import BookCard from './components/BookCard'; // from book-card branch
 
 import HomePage from './pages/HomePage';
+
 
 // createTheme enables you to customize the look and feel of your app past the default
 // in this case, we only change the color scheme
@@ -42,6 +52,7 @@ function RandomBookPage() {
 }
 
 export default function App() {
+  const [authToken, setAuthToken] = useState(localStorage.getItem('authToken') || null);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -50,6 +61,17 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/example" element={<ExamplePage />} />
+
+          <Route path="/login" element={<Login setAuthToken={setAuthToken} />} />
+          <Route path="/signup" element={<Signup setAuthToken={setAuthToken}/>} />
+          <Route 
+          path="/profile" 
+          element={
+            <RequireAuth token={authToken}>
+              <ProfilePage token={authToken} />
+            </RequireAuth>
+          } 
+        />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/books/:identifier" element={<BookDetailPage />} />
           <Route path="/booklists" element={<BookListPage />} />
