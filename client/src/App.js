@@ -4,6 +4,7 @@ import { indigo, amber } from '@mui/material/colors';
 import { createTheme } from "@mui/material/styles";
 import NavBar from './components/NavBar';
 import ExamplePage from './pages/ExamplePage';
+import BookDetailPage from './pages/BookDetailPage';
 import BookListPage from './pages/BookListPage';
 import BookDetailPage from './pages/BookDetailPage';
 import { useBooks } from './hooks/useBooks'; // adjust path as needed
@@ -45,9 +46,11 @@ export default function App() {
         <NavBar />
         <Routes>
           <Route path="/example" element={<ExamplePage />} />
+
+          <Route path="/books/:identifier" element={<BookDetailPage />} />
           <Route path="/booklists" element={<BookListPage />} />
           <Route path="/booklists/:id" element={<BookDetailPage />} />
-          <Route path="/books/random" element={<RandomBookPage />} /> {/* 💡新增頁面 */}
+          <Route path="/books/random" element={<RandomBookPage />} /> 
           <Route path="/books/:title" element={<BookDetailPage />} />
           <Route path="/" element={<Navigate to="/booklists" />} />
         </Routes>
