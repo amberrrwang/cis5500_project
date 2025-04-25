@@ -68,10 +68,17 @@ if (error) return <p>{error}</p>;
           <Typography variant="subtitle1" gutterBottom>
             {book.authors?.join(', ')}
           </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Published by {book.publisher} {book.published_year ? `in ${book.published_year}` : ''}
-          </Typography>
-
+          <Box sx={{ mt: 2 , display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Published by {book.publisher} {book.published_year ? `in ${book.published_year}` : ''}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              ISBN: {book.isbn || 'N/A'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Language: {book.language || 'N/A'}
+            </Typography>
+          </Box>
           <Box sx={{ mt: 2, mb: 1 }}>
             {book.categories?.map(category => (
               <Chip key={category} label={category} sx={{ mr: 1 }} />

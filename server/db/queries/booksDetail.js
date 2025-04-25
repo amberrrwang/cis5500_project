@@ -14,11 +14,9 @@ async function getBookMetaDataByTitle(identifier) {
 
 async function getBookByTitle(title) {
   const query = `
-    SELECT ib.isbn, ib.isbn13, ib.language, ib.date_published,
-           bm.*
-    FROM public.isbndb_books ib
-    JOIN public.books_metadata bm ON ib.title = bm.title
-    WHERE ib.title = $1
+    SELECT *
+    FROM public.isbndb_books
+    WHERE title ILIKE $1
     LIMIT 1
   `;
   const result = await db.query(query, [title]);
@@ -28,11 +26,9 @@ async function getBookByTitle(title) {
 
 async function getBookByISBN(isbn) {
   const query = `
-    SELECT ib.isbn, ib.isbn13, ib.language, ib.date_published,
-           bm.*
-    FROM public.isbndb_books ib
-    LEFT JOIN public.books_metadata bm ON ib.title = bm.title
-    WHERE ib.isbn = $1
+    SELECT *
+    FROM public.isbndb_books
+    WHERE isbn = $1
     LIMIT 1
   `;
   const result = await db.query(query, [isbn]);
