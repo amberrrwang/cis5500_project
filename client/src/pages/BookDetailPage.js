@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useParams } from 'react-router-dom'; 
 import axios from 'axios';
+import AddToReadingListButton from '../components/AddToReadingListButton'; // Adjust the path as needed
 
 import {
   Box,
@@ -9,7 +10,6 @@ import {
   Grid,
   Card,
   CardMedia,
-  CardContent,
   Chip,
   Rating,
   Link,
@@ -21,6 +21,7 @@ const BookDetailPage = () => {
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const DEFAULT_IMAGE = 'https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg';
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -44,16 +45,22 @@ if (error) return <p>{error}</p>;
     <Box sx={{ p: 4 }}>
       <Grid container spacing={4}>
         {/* Left: Book Cover */}
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardMedia
-              component="img"
-              height="400"
-              image={book.image}
-              alt={book.title}
-            />
-          </Card>
-        </Grid>
+        <Grid item xs={12} md={2}>
+        <Card sx={{ backgroundColor: 'transparent', boxShadow: 'none', height: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
+          <CardMedia
+            component="img"
+            image={book.image ? book.image : DEFAULT_IMAGE}
+            alt={book.title}
+            style={{ 
+              maxWidth: '100%', 
+              maxHeight: '400px', 
+              height: 'fit-content', 
+              objectFit: 'contain', 
+            }}
+          />
+        </Card>
+      </Grid>
+
 
         {/* Right: Book Details */}
         <Grid item xs={12} md={8}>
@@ -74,7 +81,7 @@ if (error) return <p>{error}</p>;
           <Box sx={{ mt: 2 }}>
             <Rating value={book.average_rating || 0} precision={0.1} readOnly />
             <Typography variant="body2" color="text.secondary">
-              {book.average_rating?.toFixed(2)} / 5 from {book.ratings_count} ratings
+              {book.average_rating?.toFixed(2)} / 5 from {book.rating_count} ratings
             </Typography>
           </Box>
 
@@ -89,6 +96,10 @@ if (error) return <p>{error}</p>;
               </Link>
             </Box>
           )}
+          <Box sx={{ mt: 2 }}>
+            <AddToReadingListButton bookId={book.id} />
+          </Box>
+
         </Grid>
       </Grid>
 

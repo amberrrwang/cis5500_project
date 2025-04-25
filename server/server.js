@@ -57,7 +57,7 @@ const HOST = process.env.server_host || 'localhost';
 const PORT = process.env.server_port || 5000;
 
 app.listen(PORT, HOST, () => {
-  console.log(`🚀 Server running at http://${HOST}:${PORT}/`);
+  console.log(` Server running at http://${HOST}:${PORT}/`);
 });
 
 module.exports = app;
