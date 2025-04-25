@@ -16,7 +16,7 @@ async function getBookByTitle(title) {
   const query = `
     SELECT *
     FROM public.isbndb_books
-    WHERE title ILIKE $1
+    WHERE LOWER(title) = LOWER($1)
     LIMIT 1
   `;
   const result = await db.query(query, [title]);
