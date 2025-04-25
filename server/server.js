@@ -26,7 +26,7 @@ app.use('/example', exampleRoutes);
 const searchRoutes = require('./routes/searchRoutes');
 app.use('/api/books', searchRoutes); // /api/books/search
 
-const exampleRoutes = require('./routes/books');
+const booksRoutes = require('./routes/books');
 app.use("/books", booksRoutes);
 
 const booksRouter = require('./routes/booksDetail');
