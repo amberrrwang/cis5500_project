@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemButton, ListItemText, Snackbar, Alert } from '@mui/material';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import axios from 'axios';
 
 function AddToReadingListButton({ bookId }) {
@@ -59,7 +60,21 @@ function AddToReadingListButton({ bookId }) {
 
   return (
     <>
-      <Button variant="contained" color="primary" onClick={handleOpen}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleOpen}
+        startIcon={<LibraryAddIcon />}
+        sx={{
+          backgroundColor: '#6a1b9a',
+          '&:hover': {
+            backgroundColor: '#4a148c',
+          },
+          textTransform: 'none',
+          fontWeight: 'bold',
+          fontSize: '1rem',
+        }}
+      >
         Add to Reading List
       </Button>
 
