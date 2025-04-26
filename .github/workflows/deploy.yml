@@ -10,24 +10,25 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3            
 
-      - name: Set up SSH key
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.5.4     
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Add EC2 to known_hosts
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key.pem
-          chmod 600 ec2_key.pem
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+                                            
+
       - name: Deploy to EC2
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ec2-user/CIS5500-Spring2025-Project
-            git pull https://${{ secrets.GH_ACCESS_TOKEN}}@github.com/YuqiaoSu/CIS5500-Spring2025-Project.git main
-            
-            cd client
-            npm install
-            npm run build
-
-            cd ../server
-            npm install
-            pm2 restart all || pm2 start app.js --name bookverse
+            git pull https://$GH_TOKEN@github.com/YuqiaoSu/CIS5500-Spring2025-Project.git main
+            cd client && npm install && npm run build
+            cd ../server && npm install && pm2 restart bookverse || pm2 start app.js --name bookverse             
           EOF
-
