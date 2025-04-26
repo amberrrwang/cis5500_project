@@ -10,7 +10,7 @@ const app = express();
 app.use(cors({
   origin: '*',
 }));
-
+app.use(express.static(path.join(__dirname, '../client/build')));
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
 app.use(express.json());
