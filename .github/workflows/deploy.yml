@@ -19,10 +19,9 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ec2_key.pem ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /home/ec2-user/your-repo
-
-            git pull origin main
-
+            cd /home/ec2-user/CIS5500-Spring2025-Project
+            git pull https://${{ secrets.GH_ACCESS_TOKEN}}@github.com/YuqiaoSu/CIS5500-Spring2025-Project.git main
+            
             cd client
             npm install
             npm run build
