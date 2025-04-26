@@ -22,5 +22,5 @@ jobs:
             cd /home/ec2-user/CIS5500-Spring2025-Project
             git pull https://$GH_TOKEN@github.com/YuqiaoSu/CIS5500-Spring2025-Project.git main
             cd client && npm install && npm run build
-            cd ../server && npm install && pm2 restart bookverse || pm2 start npm --name bookverse             
+            cd ../server && npm install && pm2 restart bookverse || pm2 start server.js --name bookverse             
             EOF
