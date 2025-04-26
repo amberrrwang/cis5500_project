@@ -53,8 +53,8 @@ app.post('/reading-list', verifyToken, reading.createReadingList);
 app.delete('/reading-list/:listId', verifyToken, reading.deleteReadingList);
 
 
-const HOST = process.env.server_host || 'localhost';
-const PORT = process.env.server_port || 5000;
+const HOST = process.env.SERVER_HOST || 'localhost';
+const PORT = process.env.SERVER_PORT || 5000;
 
 app.listen(PORT, HOST, () => {
   console.log(` Server running at http://${HOST}:${PORT}/`);
