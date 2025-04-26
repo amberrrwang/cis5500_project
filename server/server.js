@@ -3,8 +3,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser')
 const {verifyToken} = require("./controllers/tokenVerify");
 require('dotenv').config();
-
+const path = require('path');
 const app = express();
+
 //this is the middleware for the express server, 
 // which will be used to parse the request body and handle CORS (security)
 app.use(cors({
