@@ -16,8 +16,7 @@ import RequireAuth from './helpers/RequireAuth';
 import SearchPage from './pages/SearchPage';
 import BookDetailPage from './pages/BookDetailPage';
 import BookListPage from './pages/BookListPage';
-import BookDetailPage from './pages/BookDetailPage';
-import { useBooks } from './hooks/useBooks'; // adjust path as needed
+import useBooks from './helpers/useBooks'; // adjust path as needed
 import BookCard from './components/BookCard'; // from book-card branch
 
 import HomePage from './pages/HomePage';
