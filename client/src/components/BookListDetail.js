@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import axios from 'axios';
 import {
@@ -96,15 +96,18 @@ export default function BookListDetail() {
       });
   };
 
-  if (!bookList) return <div>Loading...</div>;
+  const filteredBooks = useMemo(() => {
+    if (!bookList?.books) return [];
+    return filterText.trim()
+      ? bookList.books.filter(b => b.title.toLowerCase().includes(filterText.toLowerCase()))
+      : bookList.books;
+  }, [bookList, filterText]);
 
-  const filteredBooks = filterText.trim()
-    ? bookList.books.filter(b => b.title.toLowerCase().includes(filterText.toLowerCase()))
-    : bookList.books;
-
-  const sortedBooks = sortByDate
-    ? [...filteredBooks].sort((a, b) => new Date(b.date_added) - new Date(a.date_added))
-    : filteredBooks;
+  const sortedBooks = useMemo(() => {
+    return sortByDate
+      ? [...filteredBooks].sort((a, b) => new Date(b.date_added) - new Date(a.date_added))
+      : filteredBooks;
+  }, [filteredBooks, sortByDate]);
 
   const renderRow = ({ index, style }) => {
     const book = sortedBooks[index];
@@ -113,15 +116,22 @@ export default function BookListDetail() {
         style={style}
         key={book.title}
         secondaryAction={
-          <IconButton edge="end" onClick={() => handleDelete(book.title)}>
+          <IconButton
+            edge="end"
+            onClick={(e) => {
+              e.stopPropagation(); // prevents click from bubbling to navigation
+              handleDelete(book.title);
+            }}
+          >
             <DeleteIcon />
           </IconButton>
         }
         disablePadding
-        component={RouterLink}
-        to={`/books/${encodeURIComponent(book.title)}`}
       >
-        <ListItemButton>
+        <ListItemButton
+          component={RouterLink}
+          to={`/books/${encodeURIComponent(book.title)}`}
+        >
           <ListItemAvatar>
             <Avatar variant="square" src={book.image || DEFAULT_IMAGE} />
           </ListItemAvatar>
