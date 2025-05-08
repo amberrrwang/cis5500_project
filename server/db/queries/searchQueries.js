@@ -125,8 +125,6 @@ async function searchBooks(queryParams) {
     // 分页
     query += ` LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
     values.push(limit, offset);
-    console.log('Executing query:', query);
-console.log('With values:', values);
     const result = await db.query(query, values);
     
     const totalCount = result.rows.length > 0 ? parseInt(result.rows[0].total_count) : 0;
