@@ -1,146 +1,167 @@
-async function searchBooks(queryParams) {
-    const {
-      title,
-      author,
-      genre,
-      min_rating,
-      max_rating,
-      start_year,
-      end_year,
-      sort_by,
-      order = 'desc',
-      limit = 10
-    } = queryParams;
-  
-    // MOCK DATA ONLY
-    let data = [
-  {
-    id: "To Kill a Mockingbird",
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    coverImage: "https://upload.wikimedia.org/wikipedia/en/7/79/To_Kill_a_Mockingbird.JPG",
-    rating: 4.8,
-    publishedYear: 1960,
-    genre: "Fiction"
-  },
-  {
-    id: "Pride and Prejudice",
-    title: "Pride and Prejudice",
-    author: "Jane Austen",
-    coverImage: "https://upload.wikimedia.org/wikipedia/commons/8/8e/PrideAndPrejudiceTitlePage.jpg",
-    rating: 4.6,
-    publishedYear: 1813,
-    genre: "Romance"
-  },
-  {
-    id: "The Catcher in the Rye",
-    title: "The Catcher in the Rye",
-    author: "J.D. Salinger",
-    coverImage: "https://upload.wikimedia.org/wikipedia/en/3/32/Rye_catcher.jpg",
-    rating: 4.2,
-    publishedYear: 1951,
-    genre: "Coming-of-Age"
-  },
-  {
-    id: "The Da Vinci Code",
-    title: "The Da Vinci Code",
-    author: "Dan Brown",
-    coverImage: "https://upload.wikimedia.org/wikipedia/en/6/6b/DaVinciCode.jpg",
-    rating: 4.0,
-    publishedYear: 2003,
-    genre: "Thriller"
-  },
-  {
-    id: "The Alchemist",
-    title: "The Alchemist",
-    author: "Paulo Coelho",
-    coverImage: "https://upload.wikimedia.org/wikipedia/en/c/c4/TheAlchemist.jpg",
-    rating: 4.3,
-    publishedYear: 1988,
-    genre: "Philosophical Fiction"
-  },
-  {
-    id: "Steve Jobs",
-    title: "Steve Jobs",
-    author: "Walter Isaacson",
-    coverImage: "https://upload.wikimedia.org/wikipedia/en/e/e7/Steve_Jobs_by_Walter_Isaacson.jpg",
-    rating: 4.5,
-    publishedYear: 2011,
-    genre: "Biography"
-  },
-  {
-    id: "The Road",
-    title: "The Road",
-    author: "Cormac McCarthy",
-    coverImage: "https://upload.wikimedia.org/wikipedia/en/8/8b/The_Road.jpg",
-    rating: 4.1,
-    publishedYear: 2006,
-    genre: "Post-Apocalyptic"
-  },
-  {
-    id: "Educated",
-    title: "Educated",
-    author: "Tara Westover",
-    coverImage: "https://upload.wikimedia.org/wikipedia/en/5/5e/Educated_%28Tara_Westover%29.png",
-    rating: 4.7,
-    publishedYear: 2018,
-    genre: "Memoir"
-  },
-  {
-    id: "Sapiens",
-    title: "Sapiens: A Brief History of Humankind",
-    author: "Yuval Noah Harari",
-    coverImage: "https://upload.wikimedia.org/wikipedia/en/8/8d/Sapiens_A_Brief_History_of_Humankind.jpg",
-    rating: 4.6,
-    publishedYear: 2011,
-    genre: "History"
-  },
-  {
-    id: "Thinking, Fast and Slow",
-    title: "Thinking, Fast and Slow",
-    author: "Daniel Kahneman",
-    coverImage: "https://upload.wikimedia.org/wikipedia/en/8/8d/Thinking%2C_Fast_and_Slow.jpg",
-    rating: 4.4,
-    publishedYear: 2011,
-    genre: "Psychology"
-  }
-];
+const db = require('../index');
 
-  
-    // Simple filter rules
-    if (title) {
-      data = data.filter(book => book.title.toLowerCase().includes(title.toLowerCase()));
+async function searchBooks(queryParams) {
+  const {
+    searchTerm,
+    searchType = 'all', // 新增全局搜索选项
+    genres = [],
+    minRating,
+    maxRating,
+    startYear,
+    endYear,
+    sortBy = 'relevance', // 新增相关性排序
+    sortOrder = 'desc',
+    limit = 20,
+    offset = 0
+  } = queryParams;
+
+  try {
+    let query = `
+      WITH book_search AS (
+        SELECT 
+          bm.title AS id,
+          bm.title,
+          bm.authors AS author,
+          bm.image AS "coverImage",
+          bm.average_rating AS rating,
+          bm.published_year AS "publishedYear",
+          bm.ratings_count AS "ratingsCount",
+          // 新增相关性计算
+          ts_rank(
+            to_tsvector('english', coalesce(bm.title, '') || ' ' || 
+                        coalesce(bm.authors, '') || ' ' || 
+                        coalesce(bm.description, '')), 
+            to_tsquery('english', $1)
+          ) AS relevance_score
+        FROM books_metadata bm
+        WHERE 1=1
+    `;
+
+    const values = [];
+    let paramCount = 1;
+
+    // 全文搜索改进
+    if (searchTerm) {
+      const searchVector = searchTerm.split(' ').map(term => `${term}:*`).join(' & ');
+      values.push(searchVector);
+      
+      if (searchType === 'title') {
+        query += ` AND to_tsvector('english', bm.title) @@ to_tsquery('english', $${paramCount})`;
+      } else if (searchType === 'author') {
+        query += ` AND to_tsvector('english', bm.authors) @@ to_tsquery('english', $${paramCount})`;
+      } else { // 全局搜索
+        query += ` AND (
+          to_tsvector('english', coalesce(bm.title, '')) @@ to_tsquery('english', $${paramCount}) OR
+          to_tsvector('english', coalesce(bm.authors, '')) @@ to_tsquery('english', $${paramCount}) OR
+          to_tsvector('english', coalesce(bm.description, '')) @@ to_tsquery('english', $${paramCount})
+        )`;
+      }
+      paramCount++;
     }
-    if (author) {
-      data = data.filter(book => book.author.toLowerCase().includes(author.toLowerCase()));
+
+    // 类型和年份过滤保持不变
+    if (genres && genres.length > 0) {
+      query += `
+        AND EXISTS (
+          SELECT 1 
+          FROM book_categories bc
+          JOIN categories c ON bc.category_id = c.category_id
+          WHERE bc.book_title = bm.title
+          AND c.category_name = ANY($${paramCount}::text[])
+        )
+      `;
+      values.push(genres);
+      paramCount++;
     }
-    if (genre) {
-      data = data.filter(book => book.genre.toLowerCase() === genre.toLowerCase());
+
+    // 评分和年份过滤
+    if (minRating !== undefined) {
+      query += ` AND bm.average_rating >= $${paramCount}`;
+      values.push(minRating);
+      paramCount++;
     }
-    if (min_rating) {
-      data = data.filter(book => book.rating >= parseFloat(min_rating));
+    if (maxRating !== undefined) {
+      query += ` AND bm.average_rating <= $${paramCount}`;
+      values.push(maxRating);
+      paramCount++;
     }
-    if (max_rating) {
-      data = data.filter(book => book.rating <= parseFloat(max_rating));
+
+    if (startYear !== undefined) {
+      query += ` AND bm.published_year >= $${paramCount}`;
+      values.push(startYear);
+      paramCount++;
     }
-    if (start_year) {
-      data = data.filter(book => book.publishedYear >= parseInt(start_year));
+    if (endYear !== undefined) {
+      query += ` AND bm.published_year <= $${paramCount}`;
+      values.push(endYear);
+      paramCount++;
     }
-    if (end_year) {
-      data = data.filter(book => book.publishedYear <= parseInt(end_year));
+
+    // 关闭 CTE
+    query += `
+      )
+      SELECT 
+        bs.*,
+        COUNT(*) OVER() as total_count
+      FROM book_search bs
+    `;
+
+    // 智能排序
+    switch (sortBy) {
+      case 'relevance':
+        query += ` ORDER BY bs.relevance_score DESC, bs.rating DESC`;
+        break;
+      case 'title':
+        query += ` ORDER BY bs.title ${sortOrder.toUpperCase()}`;
+        break;
+      case 'rating':
+        query += ` ORDER BY bs.rating ${sortOrder.toUpperCase()} NULLS LAST`;
+        break;
+      case 'year':
+        query += ` ORDER BY bs."publishedYear" ${sortOrder.toUpperCase()} NULLS LAST`;
+        break;
+      default:
+        query += ` ORDER BY bs.relevance_score DESC, bs.rating DESC`;
     }
-  
-    // Sort
-    if (sort_by === 'rating') {
-      data.sort((a, b) => order === 'asc' ? a.rating - b.rating : b.rating - a.rating);
-    } else if (sort_by === 'date') {
-      data.sort((a, b) => order === 'asc' ? a.publishedYear - b.publishedYear : b.publishedYear - a.publishedYear);
-    }
-  
-    return data.slice(0, limit);
+
+    // 分页
+    query += ` LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+    values.push(limit, offset);
+
+    const result = await db.query(query, values);
+    
+    const totalCount = result.rows.length > 0 ? parseInt(result.rows[0].total_count) : 0;
+    
+    const books = result.rows.map(({ total_count, relevance_score, ...book }) => book);
+
+    return {
+      books,
+      total: totalCount
+    };
+  } catch (error) {
+    console.error('搜索书籍时出错:', error);
+    throw error;
   }
-  
-  module.exports = {
-    searchBooks
-  };
-  
+}
+
+// 获取所有类别的函数
+async function getAllCategories() {
+  try {
+    const query = `
+      SELECT DISTINCT category_name 
+      FROM categories 
+      WHERE category_name IS NOT NULL AND TRIM(category_name) != ''
+      ORDER BY category_name
+    `;
+    const result = await db.query(query);
+    return result.rows.map(row => row.category_name);
+  } catch (error) {
+    console.error('获取类别时出错:', error);
+    throw error;
+  }
+}
+
+module.exports = {
+  searchBooks,
+  getAllCategories
+};

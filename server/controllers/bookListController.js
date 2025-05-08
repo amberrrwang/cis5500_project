@@ -16,10 +16,6 @@ const getBookListDetail = async (req, res) => {
 };
 
 // ✅ Add book to list (checks if book exists first)
-console.log('Add request:', {
-  listId: req.params.id,
-  body: req.body
-});
 const addBookToList = async (req, res) => {
   const { title, authors = 'Unknown', description = '', image = '' } = req.body;
   const listId = req.params.id;
