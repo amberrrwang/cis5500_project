@@ -47,33 +47,47 @@ const createReadingList = async function (req, res) {
 // DELETE a Reading List (protected)
 // Only allows deletion if the reading list belongs to the logged-in user
 const deleteReadingList = async function (req, res) {
+    const client = await pool.connect();
     try {
         const userId = req.user.user_id;
         const listId = req.params.listId;
 
-        await pool.query('BEGIN');
+        await client.query('BEGIN');
 
-        // First, delete entries in reading_list_books table associated with this reading list.
-        await pool.query(
+        // Delete the book‐list links
+        await client.query(
             `DELETE FROM reading_list_books WHERE list_id = $1`,
             [listId]
         );
 
-        // Then, delete the reading list itself, ensuring it belongs to the logged-in user.
-        const deleteQuery = `
-        DELETE FROM reading_lists
-        WHERE list_id = $1 AND user_id = $2
-        RETURNING list_id
-      `;
-        const { rows } = await pool.query(deleteQuery, [listId, userId]);
-        if (rows.length === 0)
-            return res.status(404).json({ message: "Reading list not found or not authorized" });
-        res.json({ message: "Reading list deleted", listId: rows[0].list_id });
+        // Delete the list row and RETURNING so we can check
+        const result = await client.query(
+            `DELETE FROM reading_lists
+         WHERE list_id = $1 AND user_id = $2
+         RETURNING list_id`,
+            [listId, userId]
+        );
+
+        if (result.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res
+                .status(404)
+                .json({ message: "Reading list not found or not authorized" });
+        }
+
+        await client.query('COMMIT');
+        return res.json({
+            message: "Reading list deleted",
+            listId: result.rows[0].list_id
+        });
     } catch (error) {
+        await client.query('ROLLBACK');
         console.error('Error deleting reading list:', error);
-        res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error" });
+    } finally {
+        client.release();
     }
-}
+};
 
 module.exports = {
     getReadingList,
