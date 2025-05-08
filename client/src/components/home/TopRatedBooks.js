@@ -111,7 +111,7 @@ export default function TopRatedBooks({ books, loading, scrollable = false }) {
               size="small"
             />
             <Typography variant="body2" color="text.secondary" ml={1}>
-              {book.average_rating?.toFixed(1) ?? '0.0'} ({book.ratings_count || 0})
+              {book.average_rating?.toFixed(1) ?? '0.0'} ({book.rating_count || 0})
             </Typography>
           </Box>
         </CardContent>
