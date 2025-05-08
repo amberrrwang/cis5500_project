@@ -16,6 +16,7 @@ import SearchPage from './pages/SearchPage';
 import BookDetailPage from './pages/BookDetailPage';
 import BookListPage from './pages/BookListPage';
 import AboutPage from './pages/AboutPage';
+import BookListDetail from './components/BookListDetail'; 
 
 import useBooks from './helpers/useBooks'; // adjust path as needed
 import BookCard from './components/BookCard'; // from book-card branch
@@ -174,7 +175,7 @@ export default function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/books/:identifier" element={<BookDetailPage />} />
           <Route path="/booklists" element={<BookListPage />} />
-          <Route path="/booklists/:id" element={<BookDetailPage />} />
+          <Route path="/booklists/:id" element={<BookListDetail />} />
           <Route path="/books/random" element={<RandomBookPage />} /> 
           <Route path="/books/:title" element={<BookDetailPage />} />
           <Route path="/" element={<Navigate to="/booklists" />} />

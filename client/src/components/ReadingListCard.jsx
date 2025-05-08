@@ -17,7 +17,7 @@ const ReadingListCard = ({ readingList, onDelete }) => {
         <Typography
           variant="h6"
           component={Link}
-          to={`/reading-list/${readingList.list_id}`}
+          to={`/booklists/${readingList.list_id}`}
           sx={{ textDecoration: 'none', color: 'inherit' }}
         >
           {readingList.list_name}
@@ -39,7 +39,7 @@ const ReadingListCard = ({ readingList, onDelete }) => {
         </Grid>
       </CardContent>
       <CardActions>
-        <Button size="small" component={Link} to={`/reading-list/${readingList.list_id}`}>
+        <Button size="small" component={Link} to={`/booklists/${readingList.list_id}`}>
           View Details
         </Button>
         <IconButton onClick={() => onDelete(readingList.list_id)} aria-label="delete">
