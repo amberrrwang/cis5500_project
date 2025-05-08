@@ -17,7 +17,7 @@ async function getBookListDetail(listId) {
 
     // Get books in the list
     const booksResult = await db.query(`
-      SELECT b.title, b.authors, b.description, b.image
+      SELECT b.title, b.description, b.image
       FROM reading_list_books rb
       JOIN books_metadata b ON rb.book_title = b.title
       WHERE rb.list_id = $1

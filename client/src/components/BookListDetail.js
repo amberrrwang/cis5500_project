@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useParams } from 'react-router-dom';
 import axios from 'axios';
 import {
   Box, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemButton,
@@ -11,76 +11,89 @@ import AddIcon from '@mui/icons-material/Add';
 
 const DEFAULT_IMAGE = 'https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg';
 
-export default function BookListDetail({ listId }) {
+export default function BookListDetail() {
+  const listId = useParams().id;
   const [bookList, setBookList] = useState(null);
   const [editName, setEditName] = useState('');
   const [showEdit, setShowEdit] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newBook, setNewBook] = useState({ title: '', authors: '' });
   const [error, setError] = useState(null);
+  const token = localStorage.getItem('authToken');
 
-  useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/booklists/${listId}`)
-      .then(res => setBookList(res.data))
-      .catch(err => {
-        console.error('Error fetching list:', err);
-        setError('Failed to load the book list. Please try again later.');
-      });
-  }, [listId]);
+useEffect(() => {
+  axios.get(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => setBookList(res.data))
+    .catch(err => {
+      console.error('Error fetching list:', err);
+      setError('Failed to load the book list. Please try again later.');
+    });
+}, [listId, token]);
 
-  const handleDelete = (title) => {
-    axios.delete(`${process.env.REACT_APP_API_URL}/${listId}/books/${encodeURIComponent(title)}`)
-      .then(() => {
-        setBookList(prev => ({
-          ...prev,
-          books: prev.books.filter(book => book.title !== title)
-        }));
-      })
-      .catch(err => {
-        console.error('Error deleting book:', err);
-        setError('Failed to delete the book. Please try again.');
-      });
-  };
+const handleDelete = (title) => {
+  axios.delete(`${process.env.REACT_APP_API_URL}/${listId}/books/${encodeURIComponent(title)}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(() => {
+      setBookList(prev => ({
+        ...prev,
+        books: prev.books.filter(book => book.title !== title)
+      }));
+    })
+    .catch(err => {
+      console.error('Error deleting book:', err);
+      setError('Failed to delete the book. Please try again.');
+    });
+};
 
-  const handleAddBook = () => {
-    axios.post(`${process.env.REACT_APP_API_URL}/booklists/${listId}/books`, newBook)
-      .then(() => {
-        setBookList(prev => ({
-          ...prev,
-          books: [...prev.books, newBook]
-        }));
-        setShowAddDialog(false);
-        setNewBook({ title: '', authors: ''});
-      })
-      .catch(err => {
-        console.error('Error adding book:', err);
-        setError('Failed to add the book. Please try again.');
-      });
-  };
+const handleAddBook = () => {
+  axios.post(`${process.env.REACT_APP_API_URL}/booklists/${listId}/books`, newBook, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(() => {
+      setBookList(prev => ({
+        ...prev,
+        books: [...prev.books, newBook]
+      }));
+      setShowAddDialog(false);
+      setNewBook({ title: '', authors: '' });
+    })
+    .catch(err => {
+      console.error('Error adding book:', err);
+      setError('Failed to add the book. Please try again.');
+    });
+};
 
-  const saveEdit = () => {
-    axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { list_name: editName })
-      .then(() => {
-        setBookList(prev => ({ ...prev, list_name: editName }));
-        setShowEdit(false);
-      })
-      .catch(err => {
-        console.error('Error updating list name:', err);
-        setError('Failed to update the list name. Please try again.');
-      });
-  };
+const saveEdit = () => {
+  axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { list_name: editName }, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(() => {
+      setBookList(prev => ({ ...prev, list_name: editName }));
+      setShowEdit(false);
+    })
+    .catch(err => {
+      console.error('Error updating list name:', err);
+      setError('Failed to update the list name. Please try again.');
+    });
+};
 
-  const toggleVisibility = () => {
-    const newStatus = !bookList.is_public;
-    axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { is_public: newStatus })
-      .then(() => {
-        setBookList(prev => ({ ...prev, is_public: newStatus }));
-      })
-      .catch(err => {
-        console.error('Error toggling visibility:', err);
-        setError('Failed to change visibility. Please try again.');
-      });
-  };
+const toggleVisibility = () => {
+  const newStatus = !bookList.is_public;
+  axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { is_public: newStatus }, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(() => {
+      setBookList(prev => ({ ...prev, is_public: newStatus }));
+    })
+    .catch(err => {
+      console.error('Error toggling visibility:', err);
+      setError('Failed to change visibility. Please try again.');
+    });
+};
+
 
   if (!bookList) return <div>Loading...</div>;
 
@@ -107,10 +120,6 @@ export default function BookListDetail({ listId }) {
             primary={book.title}
             secondary={
               <>
-                <Typography component="span" variant="body2" color="text.primary">
-                  {book.authors}
-                </Typography>
-                <br />
                 <Typography component="span" variant="body2" color="text.secondary">
                   {book.description || 'No description available.'}
                 </Typography>
