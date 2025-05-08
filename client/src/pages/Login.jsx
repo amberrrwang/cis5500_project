@@ -13,6 +13,7 @@ const Login = ({ setAuthToken }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      console.log(process.env.REACT_APP_API_URL)
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/login`, { email_username, password });
       localStorage.setItem('authToken', res.data.token);
       setAuthToken(res.data.token);
