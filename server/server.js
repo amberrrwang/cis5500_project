@@ -53,6 +53,11 @@ app.get('/reading-list', verifyToken, reading.getReadingList);
 app.post('/reading-list', verifyToken, reading.createReadingList);
 app.delete('/reading-list/:listId', verifyToken, reading.deleteReadingList);
 
+//home page
+const { getFeaturedBooks } = require('./routes/featuredBook');
+app.get('/featured-books', getFeaturedBooks);
+const { getTopBooks } = require('./routes/topBook');
+app.get('/top-rated-books', getTopBooks);
 
 const HOST = process.env.SERVER_HOST || 'localhost';
 const PORT = process.env.SERVER_PORT || 5000;
