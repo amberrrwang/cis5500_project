@@ -56,7 +56,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <NavBar />
+        <NavBar token={authToken} setAuthToken={setAuthToken} />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/example" element={<ExamplePage />} />
