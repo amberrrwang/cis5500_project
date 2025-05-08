@@ -88,9 +88,11 @@ const deleteReadingList = async function (req, res) {
         client.release();
     }
 };
+const booklistController = require('../controllers/bookListController');
 
 module.exports = {
     getReadingList,
     createReadingList,
-    deleteReadingList
+    deleteReadingList,
+    getBookListDetail: booklistController.getBookListDetail
 }
