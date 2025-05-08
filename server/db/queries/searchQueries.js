@@ -21,15 +21,12 @@ async function searchBooks(queryParams) {
         SELECT 
           bm.title AS id,
           bm.title,
-          bm.authors AS author,
           bm.image AS "coverImage",
           bm.average_rating AS rating,
           bm.published_year AS "publishedYear",
-          bm.ratings_count AS "ratingsCount",
-          // 新增相关性计算
+          bm.rating_count AS "ratingsCount",
           ts_rank(
             to_tsvector('english', coalesce(bm.title, '') || ' ' || 
-                        coalesce(bm.authors, '') || ' ' || 
                         coalesce(bm.description, '')), 
             to_tsquery('english', $1)
           ) AS relevance_score
@@ -42,7 +39,7 @@ async function searchBooks(queryParams) {
 
     // 全文搜索改进
     if (searchTerm) {
-      const searchVector = searchTerm.split(' ').map(term => `${term}:*`).join(' & ');
+      const searchVector = searchTerm.replace(/\s+/g, ' | ');
       values.push(searchVector);
       
       if (searchType === 'title') {
@@ -59,6 +56,7 @@ async function searchBooks(queryParams) {
       paramCount++;
     }
 
+  
     // 类型和年份过滤保持不变
     if (genres && genres.length > 0) {
       query += `
@@ -127,7 +125,8 @@ async function searchBooks(queryParams) {
     // 分页
     query += ` LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
     values.push(limit, offset);
-
+    console.log('Executing query:', query);
+console.log('With values:', values);
     const result = await db.query(query, values);
     
     const totalCount = result.rows.length > 0 ? parseInt(result.rows[0].total_count) : 0;
