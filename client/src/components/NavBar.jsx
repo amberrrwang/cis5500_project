@@ -21,10 +21,18 @@ const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.25) },
+  '&:hover': { 
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    transition: 'background-color 0.2s ease-in-out'
+  },
   marginRight: theme.spacing(2),
   marginLeft: theme.spacing(3),
   width: '300px',
+  transition: 'all 0.2s ease-in-out',
+  [theme.breakpoints.down('sm')]: {
+    width: '200px',
+    marginLeft: theme.spacing(1),
+  },
 }));
 const SearchIconWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -43,6 +51,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
+    '&::placeholder': {
+      opacity: 0.8,
+    },
   },
 }));
 
@@ -52,10 +63,26 @@ const NavLinkItem = ({ href, text, isMain }) => (
     noWrap
     sx={{
       mr: isMain ? 2.5 : 2,
-      fontWeight: 600,
+      fontWeight: isMain ? 700 : 500,
       color: 'white',
       textDecoration: 'none',
-      '&:hover': { color: '#e3f2fd', transform: 'scale(1.05)', transition: '0.2s' },
+      position: 'relative',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        width: '0%',
+        height: '2px',
+        bottom: -4,
+        left: 0,
+        backgroundColor: 'white',
+        transition: 'width 0.3s ease-in-out',
+      },
+      '&:hover': { 
+        color: '#e3f2fd',
+        '&::after': {
+          width: '100%',
+        },
+      },
     }}
   >
     <NavLink to={href} style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -99,9 +126,16 @@ export default function NavBar({ token, setAuthToken }) {
   const defaultAvatar = 'https://via.placeholder.com/40';
 
   return (
-    <AppBar position="static">
+    <AppBar position="sticky" sx={{ 
+      backdropFilter: 'blur(8px)',
+      backgroundColor: 'rgba(63, 81, 181, 0.95)',
+    }}>
       <Container maxWidth="xl">
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Toolbar sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          minHeight: '70px',
+        }}>
           {/* Left: Logo + Search */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <NavLinkItem href="/" text="BookVerse" isMain />
@@ -125,8 +159,17 @@ export default function NavBar({ token, setAuthToken }) {
             <NavLinkItem href="/about" text="About Us" />
 
             {user ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, gap: 1 }}>
-                {/* Avatar Link */}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                ml: 2, 
+                gap: 1,
+                '&:hover': {
+                  '& .MuiAvatar-root': {
+                    transform: 'scale(1.1)',
+                  },
+                },
+              }}>
                 <IconButton
                   component={NavLink}
                   to="/profile"
@@ -136,11 +179,15 @@ export default function NavBar({ token, setAuthToken }) {
                   <Avatar
                     src={user.profile_pic || defaultAvatar}
                     alt={user.username}
-                    sx={{ width: 40, height: 40 }}
+                    sx={{ 
+                      width: 40, 
+                      height: 40,
+                      transition: 'transform 0.2s ease-in-out',
+                      border: '2px solid white',
+                    }}
                   />
                 </IconButton>
 
-                {/* Username Link */}
                 <Typography
                   component={NavLink}
                   to="/profile"
@@ -149,7 +196,11 @@ export default function NavBar({ token, setAuthToken }) {
                     color: 'inherit',
                     textDecoration: 'none',
                     whiteSpace: 'nowrap',
-                    '&:hover': { textDecoration: 'underline' },
+                    fontWeight: 500,
+                    '&:hover': { 
+                      textDecoration: 'underline',
+                      color: '#e3f2fd',
+                    },
                   }}
                 >
                   {user.username}
@@ -163,7 +214,11 @@ export default function NavBar({ token, setAuthToken }) {
                 to="/login"
                 sx={{
                   ml: 2,
-                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' },
+                  borderWidth: 2,
+                  '&:hover': { 
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    borderWidth: 2,
+                  },
                 }}
               >
                 Login
