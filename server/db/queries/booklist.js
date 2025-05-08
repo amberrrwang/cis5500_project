@@ -3,16 +3,30 @@ const db = require('../index');
 // Get book list details
 async function getBookListDetail(listId) {
   try {
-    const result = await db.query(`
-      SELECT r.list_name, u.username, r.created_date, r.is_public,
-             b.title, b.authors
-      FROM reading_list_books rb
-      JOIN reading_lists r ON rb.list_id = r.list_id
+    // Get list metadata
+    const listResult = await db.query(`
+      SELECT r.list_id, r.list_name, r.created_date, r.is_public, u.username
+      FROM reading_lists r
       JOIN users u ON r.user_id = u.user_id
-      JOIN books_metadata b ON rb.book_title = b.title
       WHERE r.list_id = $1
     `, [listId]);
-    return result.rows;
+
+    if (listResult.rows.length === 0) {
+      return null;
+    }
+
+    // Get books in the list
+    const booksResult = await db.query(`
+      SELECT b.title, b.authors, b.description, b.image
+      FROM reading_list_books rb
+      JOIN books_metadata b ON rb.book_title = b.title
+      WHERE rb.list_id = $1
+    `, [listId]);
+
+    const bookList = listResult.rows[0];
+    bookList.books = booksResult.rows;
+
+    return bookList;
   } catch (err) {
     console.error('Error fetching book list details:', err);
     throw new Error('Database query failed');
@@ -22,14 +36,18 @@ async function getBookListDetail(listId) {
 // Add book to list
 async function addBookToList(listId, title) {
   try {
-    await db.query(`
+    const result = await db.query(`
       INSERT INTO reading_list_books (list_id, book_title)
       VALUES ($1, $2)
       ON CONFLICT DO NOTHING
+      RETURNING *;
     `, [listId, title]);
+
+    console.log('📚 Insert result:', result.rowCount);
+    return result.rowCount;
   } catch (err) {
-    console.error('Error adding book to list:', err);
-    throw new Error('Database query failed');
+    console.error('❌ Error adding book to list:', err);
+    throw err;
   }
 }
 
