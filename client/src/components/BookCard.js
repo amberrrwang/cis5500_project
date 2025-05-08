@@ -24,7 +24,7 @@ export default function BookCard({ book, onAdd }) {
       ? book.authors.join(', ')
       : JSON.parse(book.authors)?.join(', ') || String(book.authors);
   } catch {
-    authors = String(book.authors).replace(/[\[\]']/g, '');
+    authors = String(book.authors).replace(/[[\]']/g, '');
   }
 
   return (

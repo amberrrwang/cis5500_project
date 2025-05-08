@@ -20,7 +20,7 @@ export default function BookListDetail({ listId }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/booklists/${listId}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/booklists/${listId}`)
       .then(res => setBookList(res.data))
       .catch(err => {
         console.error('Error fetching list:', err);
@@ -29,7 +29,7 @@ export default function BookListDetail({ listId }) {
   }, [listId]);
 
   const handleDelete = (title) => {
-    axios.delete(`http://localhost:8080/booklists/${listId}/books/${encodeURIComponent(title)}`)
+    axios.delete(`${process.env.REACT_APP_API_URL}/${listId}/books/${encodeURIComponent(title)}`)
       .then(() => {
         setBookList(prev => ({
           ...prev,
@@ -43,7 +43,7 @@ export default function BookListDetail({ listId }) {
   };
 
   const handleAddBook = () => {
-    axios.post(`http://localhost:8080/booklists/${listId}/books`, newBook)
+    axios.post(`${process.env.REACT_APP_API_URL}/booklists/${listId}/books`, newBook)
       .then(() => {
         setBookList(prev => ({
           ...prev,
@@ -59,7 +59,7 @@ export default function BookListDetail({ listId }) {
   };
 
   const saveEdit = () => {
-    axios.put(`http://localhost:8080/booklists/${listId}`, { list_name: editName })
+    axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { list_name: editName })
       .then(() => {
         setBookList(prev => ({ ...prev, list_name: editName }));
         setShowEdit(false);
@@ -72,7 +72,7 @@ export default function BookListDetail({ listId }) {
 
   const toggleVisibility = () => {
     const newStatus = !bookList.is_public;
-    axios.put(`http://localhost:8080/booklists/${listId}`, { is_public: newStatus })
+    axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { is_public: newStatus })
       .then(() => {
         setBookList(prev => ({ ...prev, is_public: newStatus }));
       })
