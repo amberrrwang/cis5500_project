@@ -1,0 +1,26 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: AWSDeploy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3            
+
+      - name: Set up SSH agent
+        env:
+            PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY  }}
+            GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+        run: |
+            echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+            ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-34-204-225-211.compute-1.amazonaws.com << EOF
+            cd /home/ec2-user/CIS5500-Spring2025-Project
+            git pull https://$GH_TOKEN@github.com/YuqiaoSu/CIS5500-Spring2025-Project.git main
+            cd client && npm install && npm run build
+            cd ../server && npm install && pm2 restart bookverse || pm2 start server.js --name bookverse             
+            EOF

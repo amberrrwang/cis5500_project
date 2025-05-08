@@ -1,5 +1,5 @@
-# CIS5500-Spring2025-Project-BookVerse
-
+# CIS5500-Spring2025-Project-BookVerse 
+Check out our website at: [http:](http://34.204.225.211:8080/)
 ## Project Description
 
 BookVerse aims to solve the problem of book discovery in the digital age. With millions of books available, readers struggle to find their next great read that matches their preferences. Our application bridges this gap by combining comprehensive book metadata from the isbndb-full-database with authentic user reviews from Amazon Books Reviews. This creates a powerful search engine that helps users discover books based on reviews and ratings of like-minded individuals. Additionally, BookVerse provides valuable insights to authors and publishers about reader preferences and market trends.
@@ -110,6 +110,9 @@ The React app will proxy API requests to the backend based on `REACT_APP_API_URL
 - **Data Visualization**: Chart.js and D3.js
 - **Development Tools**: Git and GitHub, ESLint and Prettier, Jest, Postman for API testing
 - **Deployment**: AWS EC2 for application hosting
+
+## Deploy
+The ./github/workflows contains the deploy yaml file that will use ssh to connect to EC2 instance of AWS. It utilizes the Github Access Token to pull from the current repository. It will build the frontend static files, and then run the server with pm2 that will restart previous deploy if exist. By doing this, we can acheive a simple CICD pipeline with limited access in AWS (since we can't create IAM roles and create access keys).
 
 ## Team Members
 
