@@ -12,6 +12,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FeaturedBooks from '../components/home/FeaturedBooks';
 import TopRatedBooks from '../components/home/TopRatedBooks';
+import axios from 'axios';
 
 // Mock data for development - more items to demonstrate scrolling
 const mockFeaturedBooks = [
@@ -170,20 +171,30 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    // This will be replaced with actual API calls when backend is ready
-    // Example:
-    // const fetchBooks = async () => {
-    //   setLoading(true);
-    //   try {
-    //     const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/books/featured`);
-    //     setFeaturedBooks(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching featured books:', error);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-    // fetchBooks();
+    const fetchFeaturedBooks = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/books/featured`);
+        setFeaturedBooks(response.data);
+      } catch (error) {
+        console.error('Error fetching featured books:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    const fetchTopBooks = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/books/featured`);
+        setTopRatedBooks(response.data);
+      } catch (error) {
+        console.error('Error fetching featured books:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeaturedBooks();
+    fetchTopBooks();
   }, []);
 
   return (
