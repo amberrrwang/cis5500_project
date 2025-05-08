@@ -104,7 +104,7 @@ if (error) return <p>{error}</p>;
             </Box>
           )}
           <Box sx={{ mt: 2 }}>
-            <AddToReadingListButton bookId={book.id} />
+            <AddToReadingListButton book={book} />
           </Box>
 
         </Grid>
