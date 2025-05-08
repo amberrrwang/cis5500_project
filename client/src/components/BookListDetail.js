@@ -12,93 +12,102 @@ import AddIcon from '@mui/icons-material/Add';
 const DEFAULT_IMAGE = 'https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg';
 
 export default function BookListDetail() {
-  const listId = useParams().id;
+  const { id: listId } = useParams();
   const [bookList, setBookList] = useState(null);
   const [editName, setEditName] = useState('');
   const [showEdit, setShowEdit] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newBook, setNewBook] = useState({ title: '', authors: '' });
   const [error, setError] = useState(null);
+  const [filterText, setFilterText] = useState('');
+  const [sortByDate, setSortByDate] = useState(false);
   const token = localStorage.getItem('authToken');
 
-useEffect(() => {
-  axios.get(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-    .then(res => setBookList(res.data))
-    .catch(err => {
-      console.error('Error fetching list:', err);
-      setError('Failed to load the book list. Please try again later.');
-    });
-}, [listId, token]);
-
-const handleDelete = (title) => {
-  axios.delete(`${process.env.REACT_APP_API_URL}/${listId}/books/${encodeURIComponent(title)}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-    .then(() => {
-      setBookList(prev => ({
-        ...prev,
-        books: prev.books.filter(book => book.title !== title)
-      }));
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
-    .catch(err => {
-      console.error('Error deleting book:', err);
-      setError('Failed to delete the book. Please try again.');
-    });
-};
+      .then(res => setBookList(res.data))
+      .catch(err => {
+        console.error('Error fetching list:', err);
+        setError('Failed to load the book list. Please try again later.');
+      });
+  }, [listId, token]);
 
-const handleAddBook = () => {
-  axios.post(`${process.env.REACT_APP_API_URL}/booklists/${listId}/books`, newBook, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-    .then(() => {
-      setBookList(prev => ({
-        ...prev,
-        books: [...prev.books, newBook]
-      }));
-      setShowAddDialog(false);
-      setNewBook({ title: '', authors: '' });
+  const handleDelete = (title) => {
+    axios.delete(`${process.env.REACT_APP_API_URL}/booklists/${listId}/books/${encodeURIComponent(title)}`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
-    .catch(err => {
-      console.error('Error adding book:', err);
-      setError('Failed to add the book. Please try again.');
-    });
-};
+      .then(() => {
+        setBookList(prev => ({
+          ...prev,
+          books: prev.books.filter(book => book.title !== title)
+        }));
+      })
+      .catch(err => {
+        console.error('Error deleting book:', err);
+        setError('Failed to delete the book. Please try again.');
+      });
+  };
 
-const saveEdit = () => {
-  axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { list_name: editName }, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-    .then(() => {
-      setBookList(prev => ({ ...prev, list_name: editName }));
-      setShowEdit(false);
+  const handleAddBook = () => {
+    axios.post(`${process.env.REACT_APP_API_URL}/booklists/${listId}/books`, newBook, {
+      headers: { Authorization: `Bearer ${token}` }
     })
-    .catch(err => {
-      console.error('Error updating list name:', err);
-      setError('Failed to update the list name. Please try again.');
-    });
-};
+      .then(() => {
+        setBookList(prev => ({
+          ...prev,
+          books: [...prev.books, newBook]
+        }));
+        setShowAddDialog(false);
+        setNewBook({ title: '', authors: '' });
+      })
+      .catch(err => {
+        console.error('Error adding book:', err);
+        setError('Failed to add the book. Please try again.');
+      });
+  };
 
-const toggleVisibility = () => {
-  const newStatus = !bookList.is_public;
-  axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { is_public: newStatus }, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-    .then(() => {
-      setBookList(prev => ({ ...prev, is_public: newStatus }));
+  const saveEdit = () => {
+    axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { list_name: editName }, {
+      headers: { Authorization: `Bearer ${token}` }
     })
-    .catch(err => {
-      console.error('Error toggling visibility:', err);
-      setError('Failed to change visibility. Please try again.');
-    });
-};
+      .then(() => {
+        setBookList(prev => ({ ...prev, list_name: editName }));
+        setShowEdit(false);
+      })
+      .catch(err => {
+        console.error('Error updating list name:', err);
+        setError('Failed to update the list name. Please try again.');
+      });
+  };
 
+  const toggleVisibility = () => {
+    const newStatus = !bookList.is_public;
+    axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { is_public: newStatus }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(() => {
+        setBookList(prev => ({ ...prev, is_public: newStatus }));
+      })
+      .catch(err => {
+        console.error('Error toggling visibility:', err);
+        setError('Failed to change visibility. Please try again.');
+      });
+  };
 
   if (!bookList) return <div>Loading...</div>;
 
+  const filteredBooks = filterText.trim()
+    ? bookList.books.filter(b => b.title.toLowerCase().includes(filterText.toLowerCase()))
+    : bookList.books;
+
+  const sortedBooks = sortByDate
+    ? [...filteredBooks].sort((a, b) => new Date(b.date_added) - new Date(a.date_added))
+    : filteredBooks;
+
   const renderRow = ({ index, style }) => {
-    const book = bookList.books[index];
+    const book = sortedBooks[index];
     return (
       <ListItem
         style={style}
@@ -116,16 +125,7 @@ const toggleVisibility = () => {
           <ListItemAvatar>
             <Avatar variant="square" src={book.image || DEFAULT_IMAGE} />
           </ListItemAvatar>
-          <ListItemText
-            primary={book.title}
-            secondary={
-              <>
-                <Typography component="span" variant="body2" color="text.secondary">
-                  {book.description || 'No description available.'}
-                </Typography>
-              </>
-            }
-          />
+          <ListItemText primary={book.title} />
         </ListItemButton>
       </ListItem>
     );
@@ -150,6 +150,9 @@ const toggleVisibility = () => {
           <Typography variant="subtitle2">
             Created by {bookList.username} · {bookList.is_public ? 'Public' : 'Private'}
           </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Created on {new Date(bookList.created_date).toLocaleDateString()}
+          </Typography>
           <Button size="small" variant="outlined" onClick={toggleVisibility}>
             {bookList.is_public ? 'Make Private' : 'Make Public'}
           </Button>
@@ -158,12 +161,33 @@ const toggleVisibility = () => {
           </Button>
         </Box>
 
+        {/* Filter Input */}
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            label="Filter by Title"
+            variant="outlined"
+            fullWidth
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+          />
+        </Box>
+
+        {/* Sort Button */}
+        <Button
+          variant={sortByDate ? 'contained' : 'outlined'}
+          size="small"
+          onClick={() => setSortByDate(prev => !prev)}
+          sx={{ mb: 2 }}
+        >
+          {sortByDate ? 'Sorted by Date Added' : 'Sort by Date Added'}
+        </Button>
+
         {/* Book List */}
         <FixedSizeList
           height={400}
           width={600}
           itemSize={72}
-          itemCount={bookList.books.length}
+          itemCount={sortedBooks.length}
           overscanCount={5}
         >
           {renderRow}

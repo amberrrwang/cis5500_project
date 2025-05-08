@@ -12,11 +12,17 @@ export default function AllBookListsPage() {
   const fetchLists = () => {
     let url = `${process.env.REACT_APP_API_URL}/booklists?sort_by=${sortBy}`;
     if (userFilter) url += `&user_id=${userFilter}`;
-
-    axios.get(url)
-      .then(res => setLists(res.data))
-      .catch(err => console.error('❌ Failed to fetch lists:', err));
-  };
+  
+    const token = localStorage.getItem('authToken'); 
+  
+    axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then(res => setLists(res.data))
+    .catch(err => console.error('❌ Failed to fetch lists:', err));
+  };  
 
   useEffect(() => {
     fetchLists();
