@@ -10,9 +10,10 @@ const FeaturedBooks = forwardRef(({ books, loading, scrollable = false }, ref) =
         <CircularProgress />
       </Box>
     );
-  }
-  if (!books || books.length === 0) {
-    return <Typography>No books to display.</Typography>;
+  } else{
+    if (!books || books.length === 0) {
+      return <Typography>No books to display.</Typography>;
+    }
   }
 
   // Scrollable strip

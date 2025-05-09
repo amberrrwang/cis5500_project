@@ -56,10 +56,12 @@ app.delete('/reading-list/:listId', verifyToken, reading.deleteReadingList);
 
 
 //home page
-const { getFeaturedBooks } = require('./routes/featuredBook');
+const { getFeaturedBooks, allFeaturedBooks } = require('./routes/featuredBook');
 app.get('/featured-books', getFeaturedBooks);
-const { getTopBooks } = require('./routes/topBook');
+app.get('/featured', allFeaturedBooks);
+const { getTopBooks, bookRanking } = require('./routes/topBook');
 app.get('/top-rated-books', getTopBooks);
+app.get('/rankings', bookRanking);
 
 // booklist
 const bookListRoutes = require('./routes/booklists');

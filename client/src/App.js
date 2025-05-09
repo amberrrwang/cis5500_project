@@ -22,6 +22,8 @@ import useBooks from './helpers/useBooks'; // adjust path as needed
 import BookCard from './components/BookCard'; // from book-card branch
 
 import HomePage from './pages/HomePage';
+import FeaturedPage from './pages/FeaturedPage';
+import TopRatedPage from './pages/TopRatedPage';
 
 
 // createTheme enables you to customize the look and feel of your app past the default
@@ -179,6 +181,9 @@ export default function App() {
           <Route path="/books/random" element={<RandomBookPage />} /> 
           <Route path="/books/:title" element={<BookDetailPage />} />
           <Route path="/" element={<Navigate to="/booklists" />} />
+
+          <Route path="/featured" element={<FeaturedPage />} />
+          <Route path="/rankings" element={<TopRatedPage />} />
         </Routes>
       </Router>
     </ThemeProvider>
