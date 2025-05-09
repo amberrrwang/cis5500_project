@@ -38,13 +38,17 @@ const SearchPage = () => {
     genres: [],
     minRating: 0,
     maxRating: 5,
+    minRatingCount: 0,
+    maxRatingCount: 22023,
     startYear: 1900,
     endYear: new Date().getFullYear(),
-    sortBy: 'title',
+    sortBy: 'rating_count',
     sortOrder: 'desc',
     page: 1,
     limit: 20
   });
+
+  const [hasSearched, setHasSearched] = useState(false);
 
   const [availableGenres, setAvailableGenres] = useState([
     'Architecture',
@@ -110,11 +114,13 @@ const SearchPage = () => {
     if (!searchParams.searchTerm && searchParams.genres.length === 0) {
       setResults([]);
       setTotalResults(0);
+      setHasSearched(false);
       return;
     }
 
     setLoading(true);
     setError(null);
+    setHasSearched(true);
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/books/search`, {
         params: {
@@ -155,6 +161,14 @@ const SearchPage = () => {
       ...prev,
       minRating: newValue[0],
       maxRating: newValue[1]
+    }));
+  };
+
+  const handleRatingCountChange = (newValue) => {
+    setSearchParams(prev => ({
+      ...prev,
+      minRatingCount: newValue[0],
+      maxRatingCount: newValue[1]
     }));
   };
 
@@ -206,7 +220,9 @@ const SearchPage = () => {
             position: 'sticky',
             top: 20,
             width: '280px',
-            maxWidth: '100%'
+            maxWidth: '100%',
+            flexShrink: 0,
+            mr: 2
           }}>
             {/* Filter Header */}
             <Box sx={{ 
@@ -236,6 +252,8 @@ const SearchPage = () => {
                   onGenreChange={handleGenreChange}
                   ratingRange={[searchParams.minRating, searchParams.maxRating]}
                   onRatingChange={handleRatingChange}
+                  ratingCountRange={[searchParams.minRatingCount, searchParams.maxRatingCount]}
+                  onRatingCountChange={handleRatingCountChange}
                   yearRange={[searchParams.startYear, searchParams.endYear]}
                   onYearChange={handleYearChange}
                   sortBy={searchParams.sortBy}
@@ -251,52 +269,59 @@ const SearchPage = () => {
         {/* Right Side - Search and Results */}
         <Grid item xs={12} md={9}>
           {/* Search Bar */}
-          <Grid container spacing={2} alignItems="center" sx={{ marginBottom: 2 }}>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth>
-                <InputLabel>Search Type</InputLabel>
-                <Select
-                  value={searchParams.searchType}
-                  label="Search Type"
-                  onChange={handleSearchTypeChange}
-                >
-                  <MenuItem value="title">Title</MenuItem>
-                  <MenuItem value="author">Author</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={7}>
-              <TextField
-                fullWidth
-                placeholder={`Search by ${searchParams.searchType}...`}
-                value={searchParams.searchTerm}
-                onChange={handleSearchTermChange}
-                onKeyPress={handleKeyPress}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      {searchParams.searchTerm && (
-                        <IconButton onClick={handleClear}>
-                          <ClearIcon />
-                        </IconButton>
-                      )}
-                    </InputAdornment>
-                  )
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSearch}
-                fullWidth
-                startIcon={<SearchIcon />}
+          <Box sx={{ 
+            display: 'flex',
+            gap: 2,
+            mb: 2,
+            flexWrap: { xs: 'wrap', md: 'nowrap' }
+          }}>
+            <FormControl sx={{ width: '120px', flexShrink: 0 }}>
+              <InputLabel>Search Type</InputLabel>
+              <Select
+                value={searchParams.searchType}
+                label="Search Type"
+                onChange={handleSearchTypeChange}
+                sx={{ height: '56px' }}
               >
-                Search
-              </Button>
-            </Grid>
-          </Grid>
+                <MenuItem value="title">Title</MenuItem>
+                <MenuItem value="author">Author</MenuItem>
+              </Select>
+            </FormControl>
+
+            <TextField
+              fullWidth
+              placeholder={`Search by ${searchParams.searchType}...`}
+              value={searchParams.searchTerm}
+              onChange={handleSearchTermChange}
+              onKeyPress={handleKeyPress}
+              sx={{ height: '56px' }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {searchParams.searchTerm && (
+                      <IconButton onClick={handleClear}>
+                        <ClearIcon />
+                      </IconButton>
+                    )}
+                  </InputAdornment>
+                )
+              }}
+            />
+
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSearch}
+              sx={{ 
+                width: '120px',
+                height: '56px',
+                flexShrink: 0
+              }}
+              startIcon={<SearchIcon />}
+            >
+              Search
+            </Button>
+          </Box>
 
           {/* Error Message */}
           {error && (
@@ -312,7 +337,7 @@ const SearchPage = () => {
                 <CircularProgress />
               </Box>
             )}
-            {!loading && !error && results.length === 0 && (
+            {!loading && !error && hasSearched && results.length === 0 && (
               <Typography variant="h6" textAlign="center" color="text.secondary">
                 No results found. Try adjusting your search criteria.
               </Typography>
@@ -332,7 +357,7 @@ const SearchPage = () => {
                             image: book.coverImage,
                             publisher: book.publisher,
                             average_rating: book.rating,
-                            rating_count: book.ratingCount
+                            rating_count: book.ratingsCount
                           }}
                         />
                       </Box>

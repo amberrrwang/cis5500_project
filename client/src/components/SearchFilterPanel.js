@@ -23,6 +23,8 @@ const SearchFilterPanel = ({
   onGenreChange,
   ratingRange,
   onRatingChange,
+  ratingCountRange,
+  onRatingCountChange,
   yearRange,
   onYearChange,
   sortBy,
@@ -43,7 +45,7 @@ const SearchFilterPanel = ({
   const open = Boolean(anchorEl);
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', px: 2 }}>
       <Typography variant="h6" gutterBottom>
         Filters
       </Typography>
@@ -54,10 +56,10 @@ const SearchFilterPanel = ({
         <OutlinedInput
           label="Genres"
           onClick={handleClick}
-          value={selectedGenres.join(', ')}
+          value=""
           readOnly
           endAdornment={
-            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', p: 0.5 }}>
               {selectedGenres.map((genre) => (
                 <Chip
                   key={genre}
@@ -139,15 +141,7 @@ const SearchFilterPanel = ({
 
       {/* Rating Range */}
       <Typography gutterBottom>Rating Range</Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <TextField
-          size="small"
-          type="number"
-          value={ratingRange[0]}
-          onChange={(e) => onRatingChange([Number(e.target.value), ratingRange[1]])}
-          inputProps={{ min: 0, max: 5, step: 0.1 }}
-          sx={{ width: 80 }}
-        />
+      <Box sx={{ mb: 2 }}>
         <Slider
           value={ratingRange}
           onChange={(_, newValue) => onRatingChange(newValue)}
@@ -155,51 +149,95 @@ const SearchFilterPanel = ({
           min={0}
           max={5}
           step={0.1}
-          sx={{ flex: 1 }}
+          sx={{ mb: 1 }}
         />
-        <TextField
-          size="small"
-          type="number"
-          value={ratingRange[1]}
-          onChange={(e) => onRatingChange([ratingRange[0], Number(e.target.value)])}
-          inputProps={{ min: 0, max: 5, step: 0.1 }}
-          sx={{ width: 80 }}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <TextField
+            size="small"
+            type="number"
+            value={ratingRange[0]}
+            onChange={(e) => onRatingChange([Number(e.target.value), ratingRange[1]])}
+            inputProps={{ min: 0, max: 5, step: 0.1 }}
+            sx={{ width: 80 }}
+          />
+          <TextField
+            size="small"
+            type="number"
+            value={ratingRange[1]}
+            onChange={(e) => onRatingChange([ratingRange[0], Number(e.target.value)])}
+            inputProps={{ min: 0, max: 5, step: 0.1 }}
+            sx={{ width: 80 }}
+          />
+        </Box>
+      </Box>
+
+      {/* Rating Count Range */}
+      <Typography gutterBottom>Rating Count</Typography>
+      <Box sx={{ mb: 2 }}>
+        <Slider
+          value={ratingCountRange}
+          onChange={(_, newValue) => onRatingCountChange(newValue)}
+          valueLabelDisplay="auto"
+          min={0}
+          max={22023}
+          sx={{ mb: 1 }}
         />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <TextField
+            size="small"
+            type="number"
+            value={ratingCountRange[0]}
+            onChange={(e) => onRatingCountChange([Number(e.target.value), ratingCountRange[1]])}
+            inputProps={{ min: 0, max: 22023 }}
+            sx={{ width: 80 }}
+          />
+          <TextField
+            size="small"
+            type="number"
+            value={ratingCountRange[1]}
+            onChange={(e) => onRatingCountChange([ratingCountRange[0], Number(e.target.value)])}
+            inputProps={{ min: 0, max: 22023 }}
+            sx={{ width: 80 }}
+          />
+        </Box>
       </Box>
 
       {/* Year Range */}
       <Typography gutterBottom>Publication Year</Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <TextField
-          size="small"
-          type="number"
-          value={yearRange[0]}
-          onChange={(e) => onYearChange([Number(e.target.value), yearRange[1]])}
-          inputProps={{ min: 1900, max: new Date().getFullYear() }}
-          sx={{ width: 80 }}
-        />
+      <Box sx={{ mb: 3 }}>
         <Slider
           value={yearRange}
           onChange={(_, newValue) => onYearChange(newValue)}
           valueLabelDisplay="auto"
           min={1900}
           max={new Date().getFullYear()}
-          sx={{ flex: 1 }}
+          sx={{ mb: 1 }}
         />
-        <TextField
-          size="small"
-          type="number"
-          value={yearRange[1]}
-          onChange={(e) => onYearChange([yearRange[0], Number(e.target.value)])}
-          inputProps={{ min: 1900, max: new Date().getFullYear() }}
-          sx={{ width: 80 }}
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <TextField
+            size="small"
+            type="number"
+            value={yearRange[0]}
+            onChange={(e) => onYearChange([Number(e.target.value), yearRange[1]])}
+            inputProps={{ min: 1900, max: new Date().getFullYear() }}
+            sx={{ width: 80 }}
+          />
+          <TextField
+            size="small"
+            type="number"
+            value={yearRange[1]}
+            onChange={(e) => onYearChange([yearRange[0], Number(e.target.value)])}
+            inputProps={{ min: 1900, max: new Date().getFullYear() }}
+            sx={{ width: 80 }}
+          />
+        </Box>
       </Box>
 
       {/* Sort Controls */}
       <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>Sort By</InputLabel>
         <Select value={sortBy} label="Sort By" onChange={onSortByChange}>
+          <MenuItem value="rating_count">Rating Count</MenuItem>
           <MenuItem value="title">Title</MenuItem>
           <MenuItem value="rating">Rating</MenuItem>
           <MenuItem value="year">Publication Year</MenuItem>
