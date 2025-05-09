@@ -29,6 +29,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { useNavigate } from 'react-router-dom';
 import SearchFilterPanel from '../components/SearchFilterPanel';
+import BookCard from '../components/BookCard';
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useState({
@@ -321,51 +322,20 @@ const SearchPage = () => {
                 <Typography variant="subtitle1" gutterBottom>
                   Found {totalResults} results
                 </Typography>
-                <Grid container spacing={3}>
+                <Grid container spacing={2}>
                   {results.map((book) => (
-                    <Grid item key={book.id} xs={12} sm={6} md={4}>
-                      <Card
-                        sx={{
-                          height: '100%',
-                          transition: 'transform 0.2s, box-shadow 0.2s',
-                          '&:hover': {
-                            transform: 'translateY(-4px)',
-                            boxShadow: 6,
-                            cursor: 'pointer'
-                          }
-                        }}
-                        onClick={() => handleCardClick(book.id)}
-                      >
-                        <CardMedia
-                          component="img"
-                          height="320"
-                          image={book.coverImage || 'https://via.placeholder.com/240x360?text=No+Image'}
-                          alt={book.title}
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={book.id}>
+                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <BookCard 
+                          book={{
+                            title: book.title,
+                            image: book.coverImage,
+                            publisher: book.publisher,
+                            average_rating: book.rating,
+                            rating_count: book.ratingCount
+                          }}
                         />
-                        <CardContent>
-                          <Typography variant="h6" gutterBottom noWrap>
-                            {book.title}
-                          </Typography>
-                          <Typography variant="subtitle2" color="text.secondary" noWrap>
-                            by {book.author}
-                          </Typography>
-                          <Typography variant="body2">
-                            ⭐ {book.rating?.toFixed(1) || 'N/A'} • {book.publishedYear || 'N/A'}
-                          </Typography>
-                        </CardContent>
-                        <CardActions sx={{ justifyContent: 'flex-end' }}>
-                          <Tooltip title={favorites[book.id] ? 'Unfavorite' : 'Favorite'}>
-                            <IconButton
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleFavorite(book.id);
-                              }}
-                            >
-                              {favorites[book.id] ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
-                            </IconButton>
-                          </Tooltip>
-                        </CardActions>
-                      </Card>
+                      </Box>
                     </Grid>
                   ))}
                 </Grid>
