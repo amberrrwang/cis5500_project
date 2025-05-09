@@ -43,8 +43,6 @@ function AddToReadingListButton({ book }) {
         `${process.env.REACT_APP_API_URL}/booklists/${listId}/books`,
         {
           title: book.title,
-          authors: book.authors,
-          image: book.image,
         },
         {
           headers: {
