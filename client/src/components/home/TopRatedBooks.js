@@ -1,7 +1,11 @@
 // src/components/home/TopRatedBooks.jsx
 import React, { forwardRef } from 'react';
 import { Grid, Box, Typography, CircularProgress } from '@mui/material';
-import BookCard from '../../components/BookCard';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Rating from '@mui/material/Rating';
+import { Link } from 'react-router-dom';
 
 const TopRatedBooks = forwardRef(({ books, loading, scrollable = false }, ref) => {
   if (loading) {
@@ -15,9 +19,7 @@ const TopRatedBooks = forwardRef(({ books, loading, scrollable = false }, ref) =
     return <Typography>No top‑rated books to display.</Typography>;
   }
 
-
   const BookCard = ({ book }) => {
-
     return (
       <Card
         sx={{
