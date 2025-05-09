@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Box, 
+import {
+  Container,
+  Typography,
+  Box,
   Button,
   IconButton
 } from '@mui/material';
@@ -21,11 +21,11 @@ export default function HomePage() {
   const [featuredBooks, setFeaturedBooks] = useState([]);
   const [topRatedBooks, setTopRatedBooks] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   // References for scroll containers
   const featuredRef = useRef(null);
   const topRatedRef = useRef(null);
-  
+
   // Scroll amount for each click
   const scrollAmount = 800;
 
@@ -38,7 +38,7 @@ export default function HomePage() {
       });
     }
   };
-  
+
   const scrollFeaturedRight = () => {
     if (featuredRef.current) {
       featuredRef.current.scrollBy({
@@ -47,7 +47,7 @@ export default function HomePage() {
       });
     }
   };
-  
+
   // Scroll functions for top rated books
   const scrollTopRatedLeft = () => {
     if (topRatedRef.current) {
@@ -57,7 +57,7 @@ export default function HomePage() {
       });
     }
   };
-  
+
   const scrollTopRatedRight = () => {
     if (topRatedRef.current) {
       topRatedRef.current.scrollBy({
@@ -97,11 +97,11 @@ export default function HomePage() {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Box my={6} sx={{ textAlign: 'center' }}>
-        <Typography 
-          variant="h3" 
-          component="h1" 
-          gutterBottom 
-          sx={{ 
+        <Typography
+          variant="h3"
+          component="h1"
+          gutterBottom
+          sx={{
             fontWeight: 700,
             background: 'linear-gradient(45deg, #3f51b5 30%, #5c6bc0 90%)',
             backgroundClip: 'text',
@@ -113,12 +113,12 @@ export default function HomePage() {
         >
           Welcome to BookVerse
         </Typography>
-        <Typography 
-          variant="h6" 
-          color="textSecondary" 
-          paragraph 
-          sx={{ 
-            maxWidth: '600px', 
+        <Typography
+          variant="h6"
+          color="textSecondary"
+          paragraph
+          sx={{
+            maxWidth: '600px',
             mx: 'auto',
             lineHeight: 1.6
           }}
@@ -130,10 +130,10 @@ export default function HomePage() {
       {/* Featured Books Section */}
       <Box my={6}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography 
-            variant="h4" 
+          <Typography
+            variant="h4"
             component="h2"
-            sx={{ 
+            sx={{
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
@@ -142,8 +142,8 @@ export default function HomePage() {
           >
             Featured Books
           </Typography>
-          <Button 
-            component={Link} 
+          <Button
+            component={Link}
             to="/featured"
             endIcon={<ChevronRightIcon />}
             color="primary"
@@ -157,15 +157,15 @@ export default function HomePage() {
             View All
           </Button>
         </Box>
-        
+
         <Box position="relative">
           {/* Left scroll button */}
-          <IconButton 
+          <IconButton
             onClick={scrollFeaturedLeft}
-            sx={{ 
-              position: 'absolute', 
-              left: -20, 
-              top: '50%', 
+            sx={{
+              position: 'absolute',
+              left: 0,
+              top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 2,
               backgroundColor: 'white',
@@ -179,7 +179,7 @@ export default function HomePage() {
           >
             <ArrowBackIcon />
           </IconButton>
-          
+
           {/* Scrollable container */}
           <Box
             sx={{
@@ -197,14 +197,14 @@ export default function HomePage() {
           >
             <FeaturedBooks ref={featuredRef} books={featuredBooks} loading={loading} scrollable={true} />
           </Box>
-          
+
           {/* Right scroll button */}
-          <IconButton 
+          <IconButton
             onClick={scrollFeaturedRight}
-            sx={{ 
-              position: 'absolute', 
-              right: -20, 
-              top: '50%', 
+            sx={{
+              position: 'absolute',
+              right: 0,
+              top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 2,
               backgroundColor: 'white',
@@ -224,10 +224,10 @@ export default function HomePage() {
       {/* Top Rated Books Section */}
       <Box my={6}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography 
-            variant="h4" 
+          <Typography
+            variant="h4"
             component="h2"
-            sx={{ 
+            sx={{
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
@@ -236,9 +236,9 @@ export default function HomePage() {
           >
             Top Rated Books
           </Typography>
-          <Button 
-            component={Link} 
-            to="/top-rated"
+          <Button
+            component={Link}
+            to="/rankings"
             endIcon={<ChevronRightIcon />}
             color="primary"
             sx={{
@@ -251,15 +251,15 @@ export default function HomePage() {
             View All
           </Button>
         </Box>
-        
+
         <Box position="relative">
           {/* Left scroll button */}
-          <IconButton 
+          <IconButton
             onClick={scrollTopRatedLeft}
-            sx={{ 
-              position: 'absolute', 
-              left: -20, 
-              top: '50%', 
+            sx={{
+              position: 'absolute',
+              left: 0,
+              top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 2,
               backgroundColor: 'white',
@@ -273,7 +273,7 @@ export default function HomePage() {
           >
             <ArrowBackIcon />
           </IconButton>
-          
+
           {/* Scrollable container */}
           <Box
             sx={{
@@ -291,14 +291,14 @@ export default function HomePage() {
           >
             <TopRatedBooks ref={topRatedRef} books={topRatedBooks} loading={loading} scrollable={true} />
           </Box>
-          
+
           {/* Right scroll button */}
-          <IconButton 
+          <IconButton
             onClick={scrollTopRatedRight}
-            sx={{ 
-              position: 'absolute', 
-              right: -20, 
-              top: '50%', 
+            sx={{
+              position: 'absolute',
+              right: 0,
+              top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 2,
               backgroundColor: 'white',
@@ -316,7 +316,7 @@ export default function HomePage() {
       </Box>
 
       {/* About Us Section */}
-      <Box my={8} sx={{ 
+      <Box my={8} sx={{
         background: 'linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%)',
         py: 8,
         borderRadius: 4,
@@ -338,9 +338,9 @@ export default function HomePage() {
         />
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
           <Box display="flex" justifyContent="center" mb={3}>
-            <AutoStoriesIcon sx={{ 
-              fontSize: 60, 
-              color: 'white', 
+            <AutoStoriesIcon sx={{
+              fontSize: 60,
+              color: 'white',
               opacity: 0.9,
               animation: 'float 3s ease-in-out infinite',
               '@keyframes float': {
@@ -350,26 +350,26 @@ export default function HomePage() {
               }
             }} />
           </Box>
-          <Typography 
-            variant="h4" 
-            component="h2" 
-            gutterBottom 
-            align="center" 
-            color="white" 
-            sx={{ 
+          <Typography
+            variant="h4"
+            component="h2"
+            gutterBottom
+            align="center"
+            color="white"
+            sx={{
               fontWeight: 'bold',
               textShadow: '0px 2px 4px rgba(0,0,0,0.1)'
             }}
           >
             About BookVerse
           </Typography>
-          <Typography 
-            variant="body1" 
-            paragraph 
-            align="center" 
-            color="white" 
-            sx={{ 
-              mb: 4, 
+          <Typography
+            variant="body1"
+            paragraph
+            align="center"
+            color="white"
+            sx={{
+              mb: 4,
               fontSize: '1.1rem',
               maxWidth: '600px',
               mx: 'auto',
@@ -379,8 +379,8 @@ export default function HomePage() {
             Your ultimate destination for discovering and exploring books. Join our community of readers and find your next favorite read.
           </Typography>
           <Box display="flex" justifyContent="center" alignItems="center" gap={2}>
-            <GroupIcon sx={{ 
-              color: 'white', 
+            <GroupIcon sx={{
+              color: 'white',
               fontSize: 24,
               animation: 'pulse 2s ease-in-out infinite',
               '@keyframes pulse': {
