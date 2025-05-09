@@ -55,10 +55,12 @@ async function addBookToList(listId, title) {
 // Remove book from list
 async function removeBookFromList(listId, title) {
   try {
-    await db.query(`
+    const result = await db.query(`
       DELETE FROM reading_list_books
       WHERE list_id = $1 AND book_title = $2
     `, [listId, title]);
+
+    return result.rowCount; // return number of rows deleted
   } catch (err) {
     console.error('Error removing book from list:', err);
     throw new Error('Database query failed');

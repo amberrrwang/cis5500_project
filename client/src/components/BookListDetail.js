@@ -20,7 +20,6 @@ export default function BookListDetail() {
   const [newBook, setNewBook] = useState({ title: '', authors: '' });
   const [error, setError] = useState(null);
   const [filterText, setFilterText] = useState('');
-  const [sortByDate, setSortByDate] = useState(false);
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
@@ -34,20 +33,32 @@ export default function BookListDetail() {
       });
   }, [listId, token]);
 
-  const handleDelete = (title) => {
-    axios.delete(`${process.env.REACT_APP_API_URL}/booklists/${listId}/books/${encodeURIComponent(title)}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(() => {
-        setBookList(prev => ({
+  const handleDelete = async (title) => {
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/booklists/${listId}/books/${encodeURIComponent(title)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          validateStatus: (status) => status >= 200 && status < 300
+        }
+      );
+
+      setBookList(prev => {
+        if (!prev || !prev.books) return prev;
+        return {
           ...prev,
           books: prev.books.filter(book => book.title !== title)
-        }));
-      })
-      .catch(err => {
-        console.error('Error deleting book:', err);
-        setError('Failed to delete the book. Please try again.');
+        };
       });
+
+      setError(null);
+    } catch (err) {
+      console.error('Delete error:', err);
+      console.error('Server response:', err.response?.status, err.response?.data);
+      setError('Failed to delete the book. Please try again.');
+    }
   };
 
   const handleAddBook = () => {
@@ -103,14 +114,8 @@ export default function BookListDetail() {
       : bookList.books;
   }, [bookList, filterText]);
 
-  const sortedBooks = useMemo(() => {
-    return sortByDate
-      ? [...filteredBooks].sort((a, b) => new Date(b.date_added) - new Date(a.date_added))
-      : filteredBooks;
-  }, [filteredBooks, sortByDate]);
-
   const renderRow = ({ index, style }) => {
-    const book = sortedBooks[index];
+    const book = filteredBooks[index];
     return (
       <ListItem
         style={style}
@@ -119,7 +124,7 @@ export default function BookListDetail() {
           <IconButton
             edge="end"
             onClick={(e) => {
-              e.stopPropagation(); // prevents click from bubbling to navigation
+              e.stopPropagation();
               handleDelete(book.title);
             }}
           >
@@ -141,12 +146,19 @@ export default function BookListDetail() {
     );
   };
 
+  if (!bookList) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Typography variant="h6">Loading book list...</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
       <Box sx={{ width: '100%', maxWidth: 600, p: 3, textAlign: 'center' }}>
         {error && <Typography color="error" gutterBottom>{error}</Typography>}
 
-        {/* List Name + Edit */}
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
           <Typography variant="h5" sx={{ mr: 2 }}>{bookList.list_name}</Typography>
           <Button size="small" onClick={() => {
@@ -155,7 +167,6 @@ export default function BookListDetail() {
           }}>Edit</Button>
         </Box>
 
-        {/* Creator + Visibility + Add Button */}
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 2 }}>
           <Typography variant="subtitle2">
             Created by {bookList.username} · {bookList.is_public ? 'Public' : 'Private'}
@@ -171,7 +182,6 @@ export default function BookListDetail() {
           </Button>
         </Box>
 
-        {/* Filter Input */}
         <Box sx={{ mb: 2 }}>
           <TextField
             label="Filter by Title"
@@ -182,28 +192,16 @@ export default function BookListDetail() {
           />
         </Box>
 
-        {/* Sort Button */}
-        <Button
-          variant={sortByDate ? 'contained' : 'outlined'}
-          size="small"
-          onClick={() => setSortByDate(prev => !prev)}
-          sx={{ mb: 2 }}
-        >
-          {sortByDate ? 'Sorted by Date Added' : 'Sort by Date Added'}
-        </Button>
-
-        {/* Book List */}
         <FixedSizeList
           height={400}
           width={600}
           itemSize={72}
-          itemCount={sortedBooks.length}
+          itemCount={filteredBooks.length}
           overscanCount={5}
         >
           {renderRow}
         </FixedSizeList>
 
-        {/* Edit Dialog */}
         <Dialog open={showEdit} onClose={() => setShowEdit(false)}>
           <DialogTitle>Edit List Name</DialogTitle>
           <DialogContent>
@@ -219,7 +217,6 @@ export default function BookListDetail() {
           </DialogActions>
         </Dialog>
 
-        {/* Add Book Dialog */}
         <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)}>
           <DialogTitle>Add Book</DialogTitle>
           <DialogContent>
