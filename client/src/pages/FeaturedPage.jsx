@@ -13,7 +13,7 @@ import axios from 'axios';
 export default function FeaturedPage() {
   const [books, setBooks] = useState([]);
   const [page, setPage] = useState(1);
-  const limit = 10;                // items per page
+  const limit = 15;                // items per page
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -47,9 +47,46 @@ export default function FeaturedPage() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        All Featured Books
-      </Typography>
+      <Box sx={{ mb: 4, textAlign: 'center' }}>
+        <Typography 
+          variant="h3" 
+          component="h1" 
+          gutterBottom
+          sx={{
+            fontWeight: 600,
+            fontSize: { xs: '2.2rem', md: '3rem' },
+            letterSpacing: '-0.02em',
+            lineHeight: 1.2,
+            fontFamily: '"Playfair Display", "Georgia", serif',
+            background: 'linear-gradient(135deg, #88648F 0%, #C09BC7 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            mb: 2,
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #C09BC7 0%, #88648F 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }
+          }}
+        >
+          Featured Books
+        </Typography>
+        <Typography 
+          variant="subtitle1" 
+          color="text.secondary"
+          sx={{
+            fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
+            letterSpacing: '0.01em',
+            maxWidth: '600px',
+            mx: 'auto'
+          }}
+        >
+          Discover our carefully curated selection of featured books
+        </Typography>
+      </Box>
 
       {/* loading spinner */}
       {loading && books.length === 0 && (

@@ -5,11 +5,16 @@ const { pool } = require('../db/index');
 const getFeaturedBooks = async function (req, res) {
     try {
         const { rows } = await pool.query(`
-      SELECT title, image, average_rating, rating_count
+      SELECT 
+        title, 
+        image, 
+        average_rating, 
+        rating_count,
+        publisher
       FROM books_metadata
       WHERE image IS NOT NULL 
-        AND rating_count > 5000 
-        AND average_rating > 4.2
+        AND rating_count > 1500 
+        AND average_rating > 4.0
       ORDER BY RANDOM()
       LIMIT 10
     `);
@@ -22,7 +27,7 @@ const getFeaturedBooks = async function (req, res) {
 
 /**
  * GET /api/books/featured
- * Returns a page of “featured” books (random order by default).
+ * Returns a page of "featured" books (random order by default).
 **/
 const allFeaturedBooks = async function (req, res) {
     try {
@@ -31,25 +36,32 @@ const allFeaturedBooks = async function (req, res) {
         const limit = Math.max(parseInt(req.query.limit) || 10, 1);
         const offset = (page - 1) * limit;
 
-        // 1) Get total count
-        const countResult = await pool.query(`SELECT COUNT(*) AS total FROM books_metadata`);
+        // 1) Get total count of books meeting our criteria
+        const countResult = await pool.query(`
+            SELECT COUNT(*) AS total 
+            FROM books_metadata 
+            WHERE image IS NOT NULL 
+            AND rating_count > 1500 
+            AND average_rating > 4.0
+        `);
         const total = parseInt(countResult.rows[0].total, 10);
 
-        // 2) Fetch the page of random books
-        //    Note: OFFSET + RANDOM can be slightly inefficient for large tables.
+        // 2) Fetch the page of books meeting our criteria
         const dataResult = await pool.query(
             `
-      SELECT
-        title,
-        publisher,
-        image,
-        average_rating,
-        rating_count
-      FROM books_metadata
-      WHERE image IS NOT NULL
-      ORDER BY RANDOM()
-      LIMIT $1 OFFSET $2
-      `,
+            SELECT
+                title,
+                image,
+                average_rating,
+                rating_count,
+                publisher
+            FROM books_metadata
+            WHERE image IS NOT NULL 
+            AND rating_count > 1500 
+            AND average_rating > 4.0
+            ORDER BY RANDOM()
+            LIMIT $1 OFFSET $2
+            `,
             [limit, offset]
         );
 
