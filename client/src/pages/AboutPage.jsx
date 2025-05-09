@@ -42,34 +42,41 @@ const FeatureItem = styled(Box)(({ theme }) => ({
 export default function AboutPage() {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
-      <Box my={4}>
+      <Box sx={{ mb: 4, textAlign: 'center' }}>
         <Typography 
-          variant="h2" 
+          variant="h3" 
           component="h1" 
-          gutterBottom 
-          align="center" 
-          color="primary" 
-          sx={{ 
-            fontWeight: 700,
-            fontSize: { xs: '2rem', md: '2.75rem' },
+          gutterBottom
+          sx={{
+            fontWeight: 600,
+            fontSize: { xs: '2.2rem', md: '3rem' },
             letterSpacing: '-0.02em',
             lineHeight: 1.2,
-            fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
+            fontFamily: '"Playfair Display", "Georgia", serif',
+            background: 'linear-gradient(135deg, #88648F 0%, #C09BC7 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            mb: 2,
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #C09BC7 0%, #88648F 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }
           }}
         >
           About BookVerse
         </Typography>
         <Typography 
-          variant="h6" 
-          color="textSecondary" 
-          paragraph 
-          align="center" 
-          sx={{ 
-            mb: 6,
-            maxWidth: '600px',
-            mx: 'auto',
-            lineHeight: 1.6,
+          variant="subtitle1" 
+          color="text.secondary"
+          sx={{
+            fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
             letterSpacing: '0.01em',
+            maxWidth: '600px',
+            mx: 'auto'
           }}
         >
           Your Personal Book Discovery Platform

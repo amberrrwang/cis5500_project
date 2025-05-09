@@ -4,13 +4,49 @@ import axios from 'axios';
 import {
   Box, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemButton,
   IconButton, Typography, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions,
-  CircularProgress
+  CircularProgress, Paper, Grid, Chip, Tooltip, Divider, Container
 } from '@mui/material';
 import { FixedSizeList } from 'react-window';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import PublicIcon from '@mui/icons-material/Public';
+import LockIcon from '@mui/icons-material/Lock';
+import SortIcon from '@mui/icons-material/Sort';
+import SearchIcon from '@mui/icons-material/Search';
+import { styled } from '@mui/material/styles';
 
 const DEFAULT_IMAGE = 'https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg';
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  marginBottom: theme.spacing(3),
+  background: 'linear-gradient(135deg, #88648F 0%, #C09BC7 100%)',
+  color: 'white',
+  position: 'relative',
+  overflow: 'hidden',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'url("/pattern.png")',
+    opacity: 0.1,
+  }
+}));
+
+const BookListItem = styled(ListItem)(({ theme }) => ({
+  backgroundColor: 'white',
+  marginBottom: theme.spacing(1),
+  borderRadius: theme.shape.borderRadius,
+  transition: 'all 0.2s ease-in-out',
+  '&:hover': {
+    transform: 'translateX(4px)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+  }
+}));
 
 export default function BookListDetail() {
   const { id: listId } = useParams();
@@ -66,7 +102,6 @@ export default function BookListDetail() {
       setError(null);
     } catch (err) {
       console.error('Delete error:', err);
-      console.error('Server response:', err.response?.status, err.response?.data);
       setError('Failed to delete the book. Please try again.');
     }
   };
@@ -127,39 +162,67 @@ export default function BookListDetail() {
   const sortedBooks = useMemo(() => {
     if (!filteredBooks) return [];
     return sortByDate
-      ? [...filteredBooks].sort((a, b) => new Date(b.added_date || 0) - new Date(a.added_date || 0))
+      ? [...filteredBooks].sort((a, b) => new Date(b.date_added || 0) - new Date(a.date_added || 0))
       : filteredBooks;
   }, [filteredBooks, sortByDate]);
 
   const renderRow = ({ index, style }) => {
     const book = sortedBooks[index];
     return (
-      <ListItem
+      <BookListItem
         style={style}
         key={book.title}
         secondaryAction={
-          <IconButton
-            edge="end"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(book.title);
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
+          <Tooltip title="Remove from list">
+            <IconButton
+              edge="end"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(book.title);
+              }}
+              sx={{
+                color: 'error.main',
+                '&:hover': {
+                  backgroundColor: 'error.light',
+                  color: 'white',
+                }
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
         }
         disablePadding
       >
         <ListItemButton
           component={RouterLink}
           to={`/books/${encodeURIComponent(book.title)}`}
+          sx={{ py: 1 }}
         >
           <ListItemAvatar>
-            <Avatar variant="square" src={book.image || DEFAULT_IMAGE} />
+            <Avatar 
+              variant="square" 
+              src={book.image || DEFAULT_IMAGE}
+              sx={{ 
+                width: 50, 
+                height: 75,
+                borderRadius: 1,
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+            />
           </ListItemAvatar>
-          <ListItemText primary={book.title} />
+          <ListItemText 
+            primary={book.title}
+            secondary={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                <Typography variant="caption" color="text.secondary">
+                  Added {new Date(book.date_added).toLocaleDateString()}
+                </Typography>
+              </Box>
+            }
+          />
         </ListItemButton>
-      </ListItem>
+      </BookListItem>
     );
   };
 
@@ -188,107 +251,174 @@ export default function BookListDetail() {
   }
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-      <Box sx={{ width: '100%', maxWidth: 600, p: 3, textAlign: 'center' }}>
-        {/* List Name + Edit */}
-        {error && <Typography color="error" gutterBottom>{error}</Typography>}
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
-          <Typography variant="h5" sx={{ mr: 2 }}>{bookList.list_name}</Typography>
-          <Button size="small" onClick={() => {
-            setEditName(bookList.list_name);
-            setShowEdit(true);
-          }}>Edit</Button>
-        </Box>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
+      {/* Header Section */}
+      <StyledPaper elevation={3}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={8}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                {bookList.list_name}
+              </Typography>
+              <Tooltip title="Edit List Name">
+                <IconButton 
+                  onClick={() => {
+                    setEditName(bookList.list_name);
+                    setShowEdit(true);
+                  }}
+                  sx={{ color: 'white' }}
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                Created by {bookList.username}
+              </Typography>
+              <Chip
+                icon={bookList.is_public ? <PublicIcon /> : <LockIcon />}
+                label={bookList.is_public ? 'Public' : 'Private'}
+                color={bookList.is_public ? 'success' : 'default'}
+                sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+              />
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                Created on {new Date(bookList.created_date).toLocaleDateString()}
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+              <Button
+                variant="outlined"
+                onClick={toggleVisibility}
+                startIcon={bookList.is_public ? <LockIcon /> : <PublicIcon />}
+                sx={{ 
+                  color: 'white', 
+                  borderColor: 'white',
+                  '&:hover': {
+                    borderColor: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+              >
+                {bookList.is_public ? 'Make Private' : 'Make Public'}
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setShowAddDialog(true)}
+                sx={{ 
+                  backgroundColor: 'white',
+                  color: 'primary.main',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)'
+                  }
+                }}
+              >
+                Add Book
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </StyledPaper>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 2 }}>
-          <Typography variant="subtitle2">
-            Created by {bookList.username} · {bookList.is_public ? 'Public' : 'Private'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Created on {new Date(bookList.created_date).toLocaleDateString()}
-          </Typography>
-          <Button size="small" variant="outlined" onClick={toggleVisibility}>
-            {bookList.is_public ? 'Make Private' : 'Make Public'}
-          </Button>
-          <Button size="small" variant="contained" startIcon={<AddIcon />} onClick={() => setShowAddDialog(true)}>
-            Add Book
-          </Button>
-        </Box>
+      {/* Search and Sort Section */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={8}>
+            <TextField
+              fullWidth
+              placeholder="Search books in this list..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
+                ),
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Button
+              fullWidth
+              variant={sortByDate ? 'contained' : 'outlined'}
+              startIcon={<SortIcon />}
+              onClick={() => setSortByDate(prev => !prev)}
+            >
+              {sortByDate ? 'Sorted by Date Added' : 'Sort by Date Added'}
+            </Button>
+          </Grid>
+        </Grid>
+      </Paper>
 
-        <Box sx={{ mb: 2 }}>
-          <TextField
-            label="Filter by Title"
-            variant="outlined"
-            fullWidth
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-          />
-        </Box>
-
-        {/* Sort Button */}
-        <Button
-          variant={sortByDate ? 'contained' : 'outlined'}
-          size="small"
-          onClick={() => setSortByDate(prev => !prev)}
-          sx={{ mb: 2 }}
-        >
-          {sortByDate ? 'Sorted by Date Added' : 'Sort by Date Added'}
-        </Button>
-
-        {/* Book List */}
-        {sortedBooks.length > 0 ? (
+      {/* Book List */}
+      {sortedBooks.length > 0 ? (
+        <Paper sx={{ p: 2 }}>
           <FixedSizeList
-            height={400}
-            width={600}
-            itemSize={72}
+            height={600}
+            width="100%"
+            itemSize={90}
             itemCount={sortedBooks.length}
             overscanCount={5}
           >
             {renderRow}
           </FixedSizeList>
-        ) : (
-          <Typography>No books in this list.</Typography>
-        )}
+        </Paper>
+      ) : (
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="h6" color="text.secondary" gutterBottom>
+            No Books Found
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {filterText ? 'Try adjusting your search' : 'Start by adding some books to your list!'}
+          </Typography>
+        </Paper>
+      )}
 
-        <Dialog open={showEdit} onClose={() => setShowEdit(false)}>
-          <DialogTitle>Edit List Name</DialogTitle>
-          <DialogContent>
-            <TextField
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              fullWidth
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setShowEdit(false)}>Cancel</Button>
-            <Button onClick={saveEdit}>Save</Button>
-          </DialogActions>
-        </Dialog>
+      {/* Edit Dialog */}
+      <Dialog open={showEdit} onClose={() => setShowEdit(false)}>
+        <DialogTitle>Edit List Name</DialogTitle>
+        <DialogContent>
+          <TextField
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            fullWidth
+            autoFocus
+            margin="dense"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowEdit(false)}>Cancel</Button>
+          <Button onClick={saveEdit} variant="contained">Save</Button>
+        </DialogActions>
+      </Dialog>
 
-        <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)}>
-          <DialogTitle>Add Book</DialogTitle>
-          <DialogContent>
-            <TextField
-              label="Title"
-              fullWidth
-              margin="dense"
-              value={newBook.title}
-              onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
-            />
-            <TextField
-              label="Authors"
-              fullWidth
-              margin="dense"
-              value={newBook.authors}
-              onChange={(e) => setNewBook({ ...newBook, authors: e.target.value })}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
-            <Button onClick={handleAddBook}>Add</Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </Box>
+      {/* Add Book Dialog */}
+      <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)}>
+        <DialogTitle>Add Book to List</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Title"
+            fullWidth
+            margin="dense"
+            value={newBook.title}
+            onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
+            autoFocus
+          />
+          <TextField
+            label="Authors"
+            fullWidth
+            margin="dense"
+            value={newBook.authors}
+            onChange={(e) => setNewBook({ ...newBook, authors: e.target.value })}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
+          <Button onClick={handleAddBook} variant="contained">Add</Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
 }
