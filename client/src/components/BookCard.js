@@ -19,12 +19,11 @@ export default function BookCard({ book, onAdd }) {
   return (
     <Card
       sx={{
-        width: 200,
-        minWidth: 200,
+        width: '100%',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         transition: 'all 0.3s ease-in-out',
-        margin: '4px',
         position: 'relative',
         '&:hover': {
           transform: 'scale(1.03)',
@@ -41,33 +40,24 @@ export default function BookCard({ book, onAdd }) {
           textDecoration: 'none',
           display: 'flex',
           justifyContent: 'center',
-          p: 1
+          p: 1,
+          aspectRatio: '2/3'
         }}
       >
-        <Box
+        <CardMedia
+          component="img"
+          image={book.image || DEFAULT_IMAGE}
+          alt={book.title}
           sx={{
-            height: 240,
-            width: 160,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            height: '100%',
+            width: '100%',
+            objectFit: 'contain'
           }}
-        >
-          <CardMedia
-            component="img"
-            image={book.image || DEFAULT_IMAGE}
-            alt={book.title}
-            sx={{
-              height: '100%',
-              objectFit: 'contain',
-              maxWidth: '100%'
-            }}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = DEFAULT_IMAGE;
-            }}
-          />
-        </Box>
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = DEFAULT_IMAGE;
+          }}
+        />
       </Box>
 
       {/* Content */}
@@ -98,7 +88,13 @@ export default function BookCard({ book, onAdd }) {
           <Typography
             variant="caption"
             color="text.secondary"
-            sx={{ display: 'block', mt: 0.5 }}
+            sx={{ 
+              display: 'block', 
+              mt: 0.5,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
           >
             {book.publisher}
           </Typography>

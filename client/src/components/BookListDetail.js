@@ -22,6 +22,7 @@ export default function BookListDetail() {
   const [newBook, setNewBook] = useState({ title: '', authors: '' });
   const [error, setError] = useState(null);
   const [filterText, setFilterText] = useState('');
+  const [sortByDate, setSortByDate] = useState(false);
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
@@ -123,8 +124,15 @@ export default function BookListDetail() {
       : bookList.books;
   }, [bookList, filterText]);
 
+  const sortedBooks = useMemo(() => {
+    if (!filteredBooks) return [];
+    return sortByDate
+      ? [...filteredBooks].sort((a, b) => new Date(b.added_date || 0) - new Date(a.added_date || 0))
+      : filteredBooks;
+  }, [filteredBooks, sortByDate]);
+
   const renderRow = ({ index, style }) => {
-    const book = filteredBooks[index];
+    const book = sortedBooks[index];
     return (
       <ListItem
         style={style}

@@ -101,14 +101,24 @@ export default function HomePage() {
           component="h1" 
           gutterBottom 
           sx={{ 
-            fontWeight: 700,
-            color: 'primary.main',
+            fontWeight: 600,
             mb: 2,
-            fontSize: { xs: '2.5rem', md: '3.5rem' },
+            fontSize: { xs: '2.2rem', md: '3rem' },
             letterSpacing: '-0.02em',
             lineHeight: 1.2,
-            fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
-            textShadow: '0px 2px 4px rgba(0,0,0,0.08)'
+            fontFamily: '"Playfair Display", "Georgia", serif',
+            background: 'linear-gradient(135deg, #88648F 0%, #C09BC7 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            textShadow: 'none',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #C09BC7 0%, #88648F 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }
           }}
         >
           Discover your next great read
@@ -128,7 +138,10 @@ export default function HomePage() {
               gap: 1,
               fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
               letterSpacing: '-0.01em',
-              color: 'text.primary',
+              background: 'linear-gradient(135deg, #88648F 0%, #C09BC7 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
               position: 'relative',
               '&::after': {
                 content: '""',
@@ -137,7 +150,7 @@ export default function HomePage() {
                 left: 0,
                 width: 40,
                 height: 3,
-                backgroundColor: 'primary.main',
+                background: 'linear-gradient(135deg, #88648F 0%, #C09BC7 100%)',
                 borderRadius: 2,
               }
             }}
@@ -238,7 +251,10 @@ export default function HomePage() {
               gap: 1,
               fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
               letterSpacing: '-0.01em',
-              color: 'text.primary',
+              background: 'linear-gradient(135deg, #88648F 0%, #C09BC7 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
               position: 'relative',
               '&::after': {
                 content: '""',
@@ -247,7 +263,7 @@ export default function HomePage() {
                 left: 0,
                 width: 40,
                 height: 3,
-                backgroundColor: 'primary.main',
+                background: 'linear-gradient(135deg, #88648F 0%, #C09BC7 100%)',
                 borderRadius: 2,
               }
             }}
@@ -338,12 +354,12 @@ export default function HomePage() {
       {/* About Us Section */}
 
       <Box sx={{ 
-        background: 'linear-gradient(135deg, #AA7DB1 0%, #C39BC9 100%)',
+        background: 'linear-gradient(135deg, #88648F 0%, #C09BC7 100%)',
         py: 4,
         mt: 6,
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: '0px 4px 20px rgba(0,0,0,0.1)',
+        boxShadow: '0px 4px 20px rgba(136, 100, 143, 0.2)',
         width: '100vw',
         left: '50%',
         right: '50%',
