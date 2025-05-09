@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { useParams } from 'react-router-dom'; 
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import AddToReadingListButton from '../components/AddToReadingListButton'; // Adjust the path as needed
 import { useInView } from 'react-intersection-observer';
@@ -43,32 +43,34 @@ const BookDetailPage = () => {
   }, [identifier]);
 
   useEffect(() => {
+    // don’t even try until `book` is non‑null
+    if (!book) return;
     if (inView && loadedCount < book.reviews.length) {
       setLoadedCount(prev => Math.min(prev + 5, book.reviews.length));
     }
-  }, [inView, loadedCount, book.reviews.length]);
-  
-if (loading) return <p>Loading...</p>;
-if (error) return <p>{error}</p>;
+  }, [inView, loadedCount, book]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
   return (
     <Box sx={{ p: 4 }}>
       <Grid container spacing={4}>
         {/* Left: Book Cover */}
         <Grid item xs={12} md={2}>
-        <Card sx={{ backgroundColor: 'transparent', boxShadow: 'none', height: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
-          <CardMedia
-            component="img"
-            image={book.image ? book.image : DEFAULT_IMAGE}
-            alt={book.title}
-            style={{ 
-              maxWidth: '100%', 
-              maxHeight: '400px', 
-              height: 'fit-content', 
-              objectFit: 'contain', 
-            }}
-          />
-        </Card>
-      </Grid>
+          <Card sx={{ backgroundColor: 'transparent', boxShadow: 'none', height: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
+            <CardMedia
+              component="img"
+              image={book.image ? book.image : DEFAULT_IMAGE}
+              alt={book.title}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '400px',
+                height: 'fit-content',
+                objectFit: 'contain',
+              }}
+            />
+          </Card>
+        </Grid>
 
 
         {/* Right: Book Details */}
@@ -77,7 +79,7 @@ if (error) return <p>{error}</p>;
           <Typography variant="subtitle1" gutterBottom>
             {book.authors?.join(', ')}
           </Typography>
-          <Box sx={{ mt: 2 , display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
             <Typography variant="body2" color="text.secondary" gutterBottom>
               Published by {book.publisher} {book.published_year ? `in ${book.published_year}` : ''}
             </Typography>
@@ -121,26 +123,26 @@ if (error) return <p>{error}</p>;
 
       {/* Reviews */}
       {book.reviews && book.reviews.length > 0 && (
-  <Box sx={{ mt: 5 }}>
-    <Typography variant="h5" gutterBottom>Reviews</Typography>
-    <Divider sx={{ mb: 2 }} />
+        <Box sx={{ mt: 5 }}>
+          <Typography variant="h5" gutterBottom>Reviews</Typography>
+          <Divider sx={{ mb: 2 }} />
 
-    {book.reviews.slice(0, loadedCount).map((review, idx) => (
-      <Box key={idx} sx={{ mb: 3 }}>
-        <Rating value={review.review_score} precision={0.1} readOnly />
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{review.review_summary}</Typography>
-        <Typography variant="body2" sx={{ mb: 1 }}>{review.review_text}</Typography>
-        <Typography variant="caption" color="text.secondary">
-          Helpfulness: {review.review_helpfulness || 'N/A'}
-        </Typography>
-      </Box>
-    ))}
+          {book.reviews.slice(0, loadedCount).map((review, idx) => (
+            <Box key={idx} sx={{ mb: 3 }}>
+              <Rating value={review.review_score} precision={0.1} readOnly />
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{review.review_summary}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>{review.review_text}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                Helpfulness: {review.review_helpfulness || 'N/A'}
+              </Typography>
+            </Box>
+          ))}
 
-    {loadedCount < book.reviews.length && (
-      <div ref={loadMoreRef} style={{ height: '20px' }} />
-    )}
-  </Box>
-)}
+          {loadedCount < book.reviews.length && (
+            <div ref={loadMoreRef} style={{ height: '20px' }} />
+          )}
+        </Box>
+      )}
 
     </Box>
   );
