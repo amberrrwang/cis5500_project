@@ -18,6 +18,40 @@ async function searchBooks(queryParams) {
   } = queryParams;
 
   try {
+    // Special handling for ISBN search
+    if (searchType === 'isbn') {
+      // Validate ISBN format (10 or 13 digits)
+      const isbnRegex = /^\d{10}(\d{3})?$/;
+      if (!isbnRegex.test(searchTerm)) {
+        return { books: [], total: 0 };
+      }
+
+      const query = `
+        SELECT 
+          ib.title AS id,
+          ib.title,
+          COALESCE(bm.image, 'https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg') AS "coverImage",
+          COALESCE(bm.average_rating, 0) AS rating,
+          COALESCE(bm.published_year, EXTRACT(YEAR FROM ib.date_published::date)) AS "publishedYear",
+          COALESCE(bm.rating_count, 0) AS "ratingsCount",
+          ib.language,
+          ib.date_published,
+          bm.description,
+          bm.publisher
+        FROM isbndb_books ib
+        LEFT JOIN books_metadata bm ON LOWER(ib.title) = LOWER(bm.title)
+        WHERE ib.isbn = $1
+        LIMIT 1
+      `;
+      
+      const result = await db.query(query, [searchTerm]);
+      return {
+        books: result.rows,
+        total: result.rows.length
+      };
+    }
+
+    // Regular search for title and author
     let query = `
       WITH book_search AS (
         SELECT 
@@ -63,7 +97,6 @@ async function searchBooks(queryParams) {
       paramCount++;
     }
 
-  
     if (genres && genres.length > 0) {
       query += `
         AND EXISTS (
@@ -161,7 +194,7 @@ async function searchBooks(queryParams) {
       total: totalCount
     };
   } catch (error) {
-    console.error('搜索书籍时出错:', error);
+    console.error('Error searching books:', error);
     throw error;
   }
 }
@@ -177,7 +210,7 @@ async function getAllCategories() {
     const result = await db.query(query);
     return result.rows.map(row => row.category_name);
   } catch (error) {
-    console.error('获取类别时出错:', error);
+    console.error('Error getting categories:', error);
     throw error;
   }
 }

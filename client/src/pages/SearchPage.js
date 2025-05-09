@@ -246,21 +246,35 @@ const SearchPage = () => {
             {/* Filter Content */}
             <Collapse in={showFilters}>
               <Box sx={{ p: 2 }}>
-                <SearchFilterPanel
-                  genres={availableGenres}
-                  selectedGenres={searchParams.genres}
-                  onGenreChange={handleGenreChange}
-                  ratingRange={[searchParams.minRating, searchParams.maxRating]}
-                  onRatingChange={handleRatingChange}
-                  ratingCountRange={[searchParams.minRatingCount, searchParams.maxRatingCount]}
-                  onRatingCountChange={handleRatingCountChange}
-                  yearRange={[searchParams.startYear, searchParams.endYear]}
-                  onYearChange={handleYearChange}
-                  sortBy={searchParams.sortBy}
-                  onSortByChange={handleSortByChange}
-                  sortOrder={searchParams.sortOrder}
-                  onSortOrderChange={handleSortOrderChange}
-                />
+                {searchParams.searchType === 'isbn' ? (
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ 
+                      textAlign: 'center',
+                      py: 2,
+                      px: 1
+                    }}
+                  >
+                    Filters are not applicable when searching by ISBN
+                  </Typography>
+                ) : (
+                  <SearchFilterPanel
+                    genres={availableGenres}
+                    selectedGenres={searchParams.genres}
+                    onGenreChange={handleGenreChange}
+                    ratingRange={[searchParams.minRating, searchParams.maxRating]}
+                    onRatingChange={handleRatingChange}
+                    ratingCountRange={[searchParams.minRatingCount, searchParams.maxRatingCount]}
+                    onRatingCountChange={handleRatingCountChange}
+                    yearRange={[searchParams.startYear, searchParams.endYear]}
+                    onYearChange={handleYearChange}
+                    sortBy={searchParams.sortBy}
+                    onSortByChange={handleSortByChange}
+                    sortOrder={searchParams.sortOrder}
+                    onSortOrderChange={handleSortOrderChange}
+                  />
+                )}
               </Box>
             </Collapse>
           </Box>
@@ -285,6 +299,7 @@ const SearchPage = () => {
               >
                 <MenuItem value="title">Title</MenuItem>
                 <MenuItem value="author">Author</MenuItem>
+                <MenuItem value="isbn">ISBN</MenuItem>
               </Select>
             </FormControl>
 
