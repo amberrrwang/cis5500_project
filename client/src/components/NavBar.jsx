@@ -68,6 +68,7 @@ const NavLinkItem = ({ href, text, isMain }) => (
       textDecoration: 'none',
       position: 'relative',
       fontSize: isMain ? '1.5rem' : 'inherit',
+      fontFamily: isMain ? '"Playfair Display", "Georgia", serif' : 'inherit',
       '&::after': {
         content: '""',
         position: 'absolute',
