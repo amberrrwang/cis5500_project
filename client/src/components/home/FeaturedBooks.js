@@ -13,9 +13,10 @@ export default function FeaturedBooks({ books, loading, scrollable = false }) {
         <CircularProgress />
       </Box>
     );
-  }
-  if (!books || books.length === 0) {
-    return <Typography>No books to display.</Typography>;
+  } else{
+    if (!books || books.length === 0) {
+      return <Typography>No books to display.</Typography>;
+    }
   }
 
   const BookCard = ({ book }) => {
