@@ -125,7 +125,7 @@ export default function NavBar({ token, setAuthToken }) {
   return (
     <AppBar position="sticky" sx={{ 
       backdropFilter: 'blur(8px)',
-      backgroundColor: 'rgba(63, 81, 181, 0.95)',
+      backgroundColor: 'rgba(170, 125, 177, 0.95)',
     }}>
       <Container maxWidth="xl">
         <Toolbar sx={{ 
@@ -154,7 +154,7 @@ export default function NavBar({ token, setAuthToken }) {
 
           {/* Right: Links + Auth Button */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <NavLinkItem href="/categories" text="Categories" />
+            <NavLinkItem href="/featured" text="Featured" />
             <NavLinkItem href="/rankings" text="Rankings" />
             <NavLinkItem href="/about" text="About Us" />
 
@@ -199,7 +199,7 @@ export default function NavBar({ token, setAuthToken }) {
                     fontWeight: 500,
                     '&:hover': { 
                       textDecoration: 'underline',
-                      color: '#e3f2fd',
+                      color: '#F7B84D',
                     },
                   }}
                 >

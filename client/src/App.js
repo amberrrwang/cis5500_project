@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import { indigo, amber, grey } from '@mui/material/colors';
+import { grey } from '@mui/material/colors';
 
 import { createTheme } from "@mui/material/styles";
 import NavBar from './components/NavBar';
@@ -15,7 +15,7 @@ import RequireAuth from './helpers/RequireAuth';
 import SearchPage from './pages/SearchPage';
 import BookDetailPage from './pages/BookDetailPage';
 import BookListPage from './pages/BookListPage';
-import AboutPage from './pages/AboutPage';
+import AboutPage from './pages/AboutPage.jsx';
 import BookListDetail from './components/BookListDetail'; 
 
 import useBooks from './helpers/useBooks'; // adjust path as needed
@@ -30,15 +30,15 @@ import TopRatedPage from './pages/TopRatedPage';
 export const theme = createTheme({
   palette: {
     primary: {
-      main: indigo[700],
-      light: indigo[500],
-      dark: indigo[900],
+      main: '#AA7DB1',
+      light: '#C39BC9',
+      dark: '#8B5F91',
       contrastText: '#fff',
     },
     secondary: {
-      main: amber[600],
-      light: amber[400],
-      dark: amber[800],
+      main: '#F5A623',
+      light: '#F7B84D',
+      dark: '#D48A0F',
       contrastText: '#000',
     },
     background: {
@@ -127,6 +127,17 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
+          backgroundColor: '#AA7DB1',
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: '#AA7DB1',
+          '&:hover': {
+            color: '#8B5F91',
+          },
         },
       },
     },
