@@ -7,6 +7,8 @@ async function searchBooks(queryParams) {
     genres = [],
     minRating,
     maxRating,
+    minRatingCount,
+    maxRatingCount,
     startYear,
     endYear,
     sortBy = 'relevance', // 新增相关性排序
@@ -26,9 +28,9 @@ async function searchBooks(queryParams) {
           bm.published_year AS "publishedYear",
           bm.rating_count AS "ratingsCount",
           ts_rank(
-            to_tsvector('english', coalesce(bm.title, '') || ' ' || 
-                        coalesce(bm.description, '')), 
-            to_tsquery('english', $1)
+            to_tsvector('english', lower(coalesce(bm.title, '') || ' ' || 
+                        coalesce(bm.description, ''))), 
+            to_tsquery('english', lower($1))
           ) AS relevance_score
         FROM books_metadata bm
         WHERE 1=1
@@ -39,18 +41,24 @@ async function searchBooks(queryParams) {
 
     // 全文搜索改进
     if (searchTerm) {
-      const searchVector = searchTerm.replace(/\s+/g, ' | ');
+      // Convert search term to proper tsquery format with AND operator
+      const searchVector = searchTerm
+        .trim()
+        .toLowerCase()  // Convert to lowercase for case-insensitive search
+        .split(/\s+/)
+        .map(word => word + ':*')  // Add prefix matching
+        .join(' & ');  // Use AND operator
       values.push(searchVector);
       
       if (searchType === 'title') {
-        query += ` AND to_tsvector('english', bm.title) @@ to_tsquery('english', $${paramCount})`;
+        query += ` AND to_tsvector('english', lower(bm.title)) @@ to_tsquery('english', $${paramCount})`;
       } else if (searchType === 'author') {
-        query += ` AND to_tsvector('english', bm.authors) @@ to_tsquery('english', $${paramCount})`;
+        query += ` AND to_tsvector('english', lower(bm.authors)) @@ to_tsquery('english', $${paramCount})`;
       } else { // 全局搜索
         query += ` AND (
-          to_tsvector('english', coalesce(bm.title, '')) @@ to_tsquery('english', $${paramCount}) OR
-          to_tsvector('english', coalesce(bm.authors, '')) @@ to_tsquery('english', $${paramCount}) OR
-          to_tsvector('english', coalesce(bm.description, '')) @@ to_tsquery('english', $${paramCount})
+          to_tsvector('english', lower(coalesce(bm.title, ''))) @@ to_tsquery('english', $${paramCount}) OR
+          to_tsvector('english', lower(coalesce(bm.authors, ''))) @@ to_tsquery('english', $${paramCount}) OR
+          to_tsvector('english', lower(coalesce(bm.description, ''))) @@ to_tsquery('english', $${paramCount})
         )`;
       }
       paramCount++;
@@ -84,6 +92,17 @@ async function searchBooks(queryParams) {
       paramCount++;
     }
 
+    if (minRatingCount !== undefined) {
+      query += ` AND bm.rating_count >= $${paramCount}`;
+      values.push(minRatingCount);
+      paramCount++;
+    }
+    if (maxRatingCount !== undefined) {
+      query += ` AND bm.rating_count <= $${paramCount}`;
+      values.push(maxRatingCount);
+      paramCount++;
+    }
+
     if (startYear !== undefined) {
       query += ` AND bm.published_year >= $${paramCount}`;
       values.push(startYear);
@@ -107,7 +126,19 @@ async function searchBooks(queryParams) {
     // 智能排序
     switch (sortBy) {
       case 'relevance':
-        query += ` ORDER BY bs.relevance_score DESC, bs.rating DESC`;
+        query += ` ORDER BY 
+          CASE 
+            WHEN lower(bs.title) LIKE lower($${paramCount}) THEN 1  -- Exact match gets highest priority
+            WHEN lower(bs.title) LIKE lower($${paramCount + 1}) THEN 2  -- Starts with search term
+            ELSE 3
+          END,
+          bs.relevance_score DESC, 
+          bs.rating DESC`;
+        values.push(`%${searchTerm}%`, `${searchTerm}%`);
+        paramCount += 2;
+        break;
+      case 'rating_count':
+        query += ` ORDER BY bs."ratingsCount" ${sortOrder.toUpperCase()} NULLS LAST`;
         break;
       case 'title':
         query += ` ORDER BY bs.title ${sortOrder.toUpperCase()}`;

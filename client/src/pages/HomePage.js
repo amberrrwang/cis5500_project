@@ -97,18 +97,21 @@ export default function HomePage() {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Box my={6} sx={{ textAlign: 'center' }}>
-        <Typography
-          variant="h3"
-          component="h1"
-          gutterBottom
-          sx={{
-            fontWeight: 700,
+        <Typography 
+          variant="h2" 
+          component="h1" 
+          gutterBottom 
+          sx={{ 
+            fontWeight: 800,
             background: 'linear-gradient(45deg, #3f51b5 30%, #5c6bc0 90%)',
             backgroundClip: 'text',
             textFillColor: 'transparent',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 2
+            mb: 2,
+            fontSize: { xs: '2rem', md: '3rem' },
+            letterSpacing: '-0.5px',
+            textShadow: '0px 2px 4px rgba(0,0,0,0.1)'
           }}
         >
           Welcome to BookVerse
@@ -316,13 +319,21 @@ export default function HomePage() {
       </Box>
 
       {/* About Us Section */}
-      <Box my={8} sx={{
+
+      <Box sx={{ 
         background: 'linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%)',
-        py: 8,
-        borderRadius: 4,
+        py: 4,
+        mt: 6,
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: '0px 4px 20px rgba(0,0,0,0.1)'
+        boxShadow: '0px 4px 20px rgba(0,0,0,0.1)',
+        width: '100vw',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw',
+        marginBottom: '-24px',
+        borderRadius: 0
       }}>
         <Box
           sx={{
@@ -337,10 +348,10 @@ export default function HomePage() {
           }}
         />
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-          <Box display="flex" justifyContent="center" mb={3}>
-            <AutoStoriesIcon sx={{
-              fontSize: 60,
-              color: 'white',
+          <Box display="flex" justifyContent="center" mb={1}>
+            <AutoStoriesIcon sx={{ 
+              fontSize: 36, 
+              color: 'white', 
               opacity: 0.9,
               animation: 'float 3s ease-in-out infinite',
               '@keyframes float': {
@@ -350,38 +361,41 @@ export default function HomePage() {
               }
             }} />
           </Box>
-          <Typography
-            variant="h4"
-            component="h2"
-            gutterBottom
-            align="center"
-            color="white"
-            sx={{
+
+          <Typography 
+            variant="h5" 
+            component="h2" 
+            gutterBottom 
+            align="center" 
+            color="white" 
+            sx={{ 
               fontWeight: 'bold',
-              textShadow: '0px 2px 4px rgba(0,0,0,0.1)'
+              textShadow: '0px 2px 4px rgba(0,0,0,0.1)',
+              mb: 1
             }}
           >
             About BookVerse
           </Typography>
-          <Typography
-            variant="body1"
-            paragraph
-            align="center"
-            color="white"
-            sx={{
-              mb: 4,
-              fontSize: '1.1rem',
+          <Typography 
+            variant="body1" 
+            paragraph 
+            align="center" 
+            color="white" 
+            sx={{ 
+              mb: 2, 
+              fontSize: '1rem',
               maxWidth: '600px',
               mx: 'auto',
-              lineHeight: 1.6
+              lineHeight: 1.5
             }}
           >
-            Your ultimate destination for discovering and exploring books. Join our community of readers and find your next favorite read.
+            Your destination for discovering and exploring books. Join our community of readers and find your next favorite read.
           </Typography>
           <Box display="flex" justifyContent="center" alignItems="center" gap={2}>
-            <GroupIcon sx={{
-              color: 'white',
-              fontSize: 24,
+
+            <GroupIcon sx={{ 
+              color: 'white', 
+              fontSize: 20,
               animation: 'pulse 2s ease-in-out infinite',
               '@keyframes pulse': {
                 '0%': { transform: 'scale(1)' },
@@ -394,10 +408,10 @@ export default function HomePage() {
               to="/about"
               variant="contained"
               color="secondary"
-              size="large"
+              size="medium"
               sx={{
-                px: 4,
-                py: 1.5,
+                px: 3,
+                py: 1,
                 '&:hover': {
                   transform: 'scale(1.05)',
                   transition: 'transform 0.2s ease-in-out',

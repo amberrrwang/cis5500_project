@@ -59,7 +59,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const NavLinkItem = ({ href, text, isMain }) => (
   <Typography
-    variant={isMain ? 'h6' : 'body1'}
+    variant={isMain ? 'h5' : 'body1'}
     noWrap
     sx={{
       mr: isMain ? 2.5 : 2,
@@ -67,6 +67,7 @@ const NavLinkItem = ({ href, text, isMain }) => (
       color: 'white',
       textDecoration: 'none',
       position: 'relative',
+      fontSize: isMain ? '1.5rem' : 'inherit',
       '&::after': {
         content: '""',
         position: 'absolute',
@@ -93,7 +94,6 @@ const NavLinkItem = ({ href, text, isMain }) => (
 
 export default function NavBar({ token, setAuthToken }) {
   const [user, setUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
   // Whenever token changes, fetch the user profile
@@ -116,11 +116,8 @@ export default function NavBar({ token, setAuthToken }) {
     })();
   }, [token]);
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
+  const handleSearchClick = () => {
+    navigate('/search');
   };
 
   const defaultAvatar = 'https://via.placeholder.com/40';
@@ -139,17 +136,20 @@ export default function NavBar({ token, setAuthToken }) {
           {/* Left: Logo + Search */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <NavLinkItem href="/" text="BookVerse" isMain />
-            <form onSubmit={handleSearchSubmit}>
-              <Search>
-                <SearchIconWrapper><SearchIcon /></SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search books..."
-                  inputProps={{ 'aria-label': 'search' }}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </Search>
-            </form>
+            <IconButton
+              onClick={handleSearchClick}
+              sx={{
+                ml: 2,
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  transform: 'scale(1.1)',
+                  transition: 'all 0.2s ease-in-out'
+                }
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
           </Box>
 
           {/* Right: Links + Auth Button */}
