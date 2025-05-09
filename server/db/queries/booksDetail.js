@@ -4,10 +4,10 @@ async function getBookMetaDataByTitle(identifier) {
   const query = `
     SELECT *
     FROM public.books_metadata
-    WHERE title ILIKE $1
+    WHERE LOWER(title) = LOWER($1)
     LIMIT 1
   `;
-  const result = await db.query(query, [`%${identifier}%`]);
+  const result = await db.query(query, [identifier]);
   return result.rows[0];
 }
 

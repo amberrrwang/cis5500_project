@@ -22,19 +22,20 @@ exports.getBookByIdentifierAPI = async (req, res) => {
 
 async function getBookByIdentifier(identifier) {
   const isISBN = /^\d{10}(\d{3})?$/.test(identifier);
+  const decodedIdentifier = decodeURIComponent(identifier);
 
   const book = isISBN
-    ? await bookService.getBookByISBN(identifier)
-    : await bookService.getBookByTitle(identifier);
+    ? await bookService.getBookByISBN(decodedIdentifier)
+    : await bookService.getBookByTitle(decodedIdentifier);
 
   if (!book) return null;
 
-  const meta = await bookService.getBookMetaDataByTitle(book.title);
+  const meta = await bookService.getBookMetaDataByTitle(decodedIdentifier);
+  
+  if (!meta) return null;
 
-  return meta ? { ...book, ...meta } : null;
+  return { ...book, ...meta };
 }
-
-
 
 exports.getBookAuthors = async (req, res) => {
   try {
