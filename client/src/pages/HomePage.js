@@ -11,7 +11,6 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import GroupIcon from '@mui/icons-material/Group';
 import FeaturedBooks from '../components/home/FeaturedBooks';
 import TopRatedBooks from '../components/home/TopRatedBooks';
 import axios from 'axios';
@@ -102,28 +101,14 @@ export default function HomePage() {
           component="h1" 
           gutterBottom 
           sx={{ 
-            fontWeight: 800,
-            background: 'linear-gradient(45deg, #3f51b5 30%, #5c6bc0 90%)',
-            backgroundClip: 'text',
-            textFillColor: 'transparent',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            fontWeight: 700,
+            color: 'primary.main',
             mb: 2,
-            fontSize: { xs: '2rem', md: '3rem' },
-            letterSpacing: '-0.5px',
-            textShadow: '0px 2px 4px rgba(0,0,0,0.1)'
-          }}
-        >
-          Welcome to BookVerse
-        </Typography>
-        <Typography
-          variant="h6"
-          color="textSecondary"
-          paragraph
-          sx={{
-            maxWidth: '600px',
-            mx: 'auto',
-            lineHeight: 1.6
+            fontSize: { xs: '2.5rem', md: '3.5rem' },
+            letterSpacing: '-0.02em',
+            lineHeight: 1.2,
+            fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
+            textShadow: '0px 2px 4px rgba(0,0,0,0.08)'
           }}
         >
           Discover your next great read
@@ -140,7 +125,21 @@ export default function HomePage() {
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: 1
+              gap: 1,
+              fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
+              letterSpacing: '-0.01em',
+              color: 'text.primary',
+              position: 'relative',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -8,
+                left: 0,
+                width: 40,
+                height: 3,
+                backgroundColor: 'primary.main',
+                borderRadius: 2,
+              }
             }}
           >
             Featured Books
@@ -151,6 +150,8 @@ export default function HomePage() {
             endIcon={<ChevronRightIcon />}
             color="primary"
             sx={{
+              fontWeight: 500,
+              letterSpacing: '0.02em',
               '&:hover': {
                 transform: 'translateX(4px)',
                 transition: 'transform 0.2s ease-in-out'
@@ -234,7 +235,21 @@ export default function HomePage() {
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: 1
+              gap: 1,
+              fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
+              letterSpacing: '-0.01em',
+              color: 'text.primary',
+              position: 'relative',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -8,
+                left: 0,
+                width: 40,
+                height: 3,
+                backgroundColor: 'primary.main',
+                borderRadius: 2,
+              }
             }}
           >
             Top Rated Books
@@ -245,6 +260,8 @@ export default function HomePage() {
             endIcon={<ChevronRightIcon />}
             color="primary"
             sx={{
+              fontWeight: 500,
+              letterSpacing: '0.02em',
               '&:hover': {
                 transform: 'translateX(4px)',
                 transition: 'transform 0.2s ease-in-out'
@@ -321,7 +338,7 @@ export default function HomePage() {
       {/* About Us Section */}
 
       <Box sx={{ 
-        background: 'linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%)',
+        background: 'linear-gradient(135deg, #AA7DB1 0%, #C39BC9 100%)',
         py: 4,
         mt: 6,
         position: 'relative',
@@ -369,7 +386,9 @@ export default function HomePage() {
             align="center" 
             color="white" 
             sx={{ 
-              fontWeight: 'bold',
+              fontWeight: 600,
+              fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
+              letterSpacing: '-0.01em',
               textShadow: '0px 2px 4px rgba(0,0,0,0.1)',
               mb: 1
             }}
@@ -383,39 +402,35 @@ export default function HomePage() {
             color="white" 
             sx={{ 
               mb: 2, 
-              fontSize: '1rem',
+              fontSize: '1.1rem',
               maxWidth: '600px',
               mx: 'auto',
-              lineHeight: 1.5
+              lineHeight: 1.6,
+              letterSpacing: '0.01em',
+              fontWeight: 400
             }}
           >
             Your destination for discovering and exploring books. Join our community of readers and find your next favorite read.
           </Typography>
-          <Box display="flex" justifyContent="center" alignItems="center" gap={2}>
-
-            <GroupIcon sx={{ 
-              color: 'white', 
-              fontSize: 20,
-              animation: 'pulse 2s ease-in-out infinite',
-              '@keyframes pulse': {
-                '0%': { transform: 'scale(1)' },
-                '50%': { transform: 'scale(1.1)' },
-                '100%': { transform: 'scale(1)' }
-              }
-            }} />
+          <Box display="flex" justifyContent="center">
             <Button
               component={Link}
               to="/about"
               variant="contained"
-              color="secondary"
+              color="primary"
               size="medium"
               sx={{
                 px: 3,
                 py: 1,
+                backgroundColor: 'white',
+                color: 'primary.main',
+                fontWeight: 500,
+                letterSpacing: '0.02em',
                 '&:hover': {
                   transform: 'scale(1.05)',
                   transition: 'transform 0.2s ease-in-out',
-                  backgroundColor: '#ffb74d'
+                  backgroundColor: 'white',
+                  color: 'primary.dark'
                 }
               }}
             >

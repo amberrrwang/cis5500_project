@@ -3,7 +3,8 @@ import { Link as RouterLink, useParams } from 'react-router-dom';
 import axios from 'axios';
 import {
   Box, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemButton,
-  IconButton, Typography, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions
+  IconButton, Typography, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions,
+  CircularProgress
 } from '@mui/material';
 import { FixedSizeList } from 'react-window';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,6 +15,7 @@ const DEFAULT_IMAGE = 'https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg
 export default function BookListDetail() {
   const { id: listId } = useParams();
   const [bookList, setBookList] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [editName, setEditName] = useState('');
   const [showEdit, setShowEdit] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -23,13 +25,20 @@ export default function BookListDetail() {
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
+    setLoading(true);
     axios.get(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => setBookList(res.data))
+      .then(res => {
+        setBookList(res.data);
+        setError(null);
+      })
       .catch(err => {
         console.error('Error fetching list:', err);
         setError('Failed to load the book list. Please try again later.');
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, [listId, token]);
 
@@ -146,10 +155,26 @@ export default function BookListDetail() {
     );
   };
 
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
   if (!bookList) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <Typography variant="h6">Loading book list...</Typography>
+        <Typography>Book list not found.</Typography>
       </Box>
     );
   }
@@ -157,8 +182,8 @@ export default function BookListDetail() {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
       <Box sx={{ width: '100%', maxWidth: 600, p: 3, textAlign: 'center' }}>
+        {/* List Name + Edit */}
         {error && <Typography color="error" gutterBottom>{error}</Typography>}
-
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
           <Typography variant="h5" sx={{ mr: 2 }}>{bookList.list_name}</Typography>
           <Button size="small" onClick={() => {
@@ -192,15 +217,30 @@ export default function BookListDetail() {
           />
         </Box>
 
-        <FixedSizeList
-          height={400}
-          width={600}
-          itemSize={72}
-          itemCount={filteredBooks.length}
-          overscanCount={5}
+        {/* Sort Button */}
+        <Button
+          variant={sortByDate ? 'contained' : 'outlined'}
+          size="small"
+          onClick={() => setSortByDate(prev => !prev)}
+          sx={{ mb: 2 }}
         >
-          {renderRow}
-        </FixedSizeList>
+          {sortByDate ? 'Sorted by Date Added' : 'Sort by Date Added'}
+        </Button>
+
+        {/* Book List */}
+        {sortedBooks.length > 0 ? (
+          <FixedSizeList
+            height={400}
+            width={600}
+            itemSize={72}
+            itemCount={sortedBooks.length}
+            overscanCount={5}
+          >
+            {renderRow}
+          </FixedSizeList>
+        ) : (
+          <Typography>No books in this list.</Typography>
+        )}
 
         <Dialog open={showEdit} onClose={() => setShowEdit(false)}>
           <DialogTitle>Edit List Name</DialogTitle>

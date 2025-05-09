@@ -3,7 +3,7 @@ const db = require('../index');
 async function searchBooks(queryParams) {
   const {
     searchTerm,
-    searchType = 'all', // 新增全局搜索选项
+    searchType = 'all',
     genres = [],
     minRating,
     maxRating,
@@ -11,7 +11,7 @@ async function searchBooks(queryParams) {
     maxRatingCount,
     startYear,
     endYear,
-    sortBy = 'relevance', // 新增相关性排序
+    sortBy = 'relevance',
     sortOrder = 'desc',
     limit = 20,
     offset = 0
@@ -39,7 +39,6 @@ async function searchBooks(queryParams) {
     const values = [];
     let paramCount = 1;
 
-    // 全文搜索改进
     if (searchTerm) {
       // Convert search term to proper tsquery format with AND operator
       const searchVector = searchTerm
@@ -54,7 +53,7 @@ async function searchBooks(queryParams) {
         query += ` AND to_tsvector('english', lower(bm.title)) @@ to_tsquery('english', $${paramCount})`;
       } else if (searchType === 'author') {
         query += ` AND to_tsvector('english', lower(bm.authors)) @@ to_tsquery('english', $${paramCount})`;
-      } else { // 全局搜索
+      } else {
         query += ` AND (
           to_tsvector('english', lower(coalesce(bm.title, ''))) @@ to_tsquery('english', $${paramCount}) OR
           to_tsvector('english', lower(coalesce(bm.authors, ''))) @@ to_tsquery('english', $${paramCount}) OR
@@ -65,7 +64,6 @@ async function searchBooks(queryParams) {
     }
 
   
-    // 类型和年份过滤保持不变
     if (genres && genres.length > 0) {
       query += `
         AND EXISTS (
@@ -80,7 +78,6 @@ async function searchBooks(queryParams) {
       paramCount++;
     }
 
-    // 评分和年份过滤
     if (minRating !== undefined) {
       query += ` AND bm.average_rating >= $${paramCount}`;
       values.push(minRating);
@@ -114,7 +111,6 @@ async function searchBooks(queryParams) {
       paramCount++;
     }
 
-    // 关闭 CTE
     query += `
       )
       SELECT 
@@ -123,7 +119,6 @@ async function searchBooks(queryParams) {
       FROM book_search bs
     `;
 
-    // 智能排序
     switch (sortBy) {
       case 'relevance':
         query += ` ORDER BY 
@@ -153,7 +148,6 @@ async function searchBooks(queryParams) {
         query += ` ORDER BY bs.relevance_score DESC, bs.rating DESC`;
     }
 
-    // 分页
     query += ` LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
     values.push(limit, offset);
     const result = await db.query(query, values);
@@ -172,7 +166,6 @@ async function searchBooks(queryParams) {
   }
 }
 
-// 获取所有类别的函数
 async function getAllCategories() {
   try {
     const query = `
