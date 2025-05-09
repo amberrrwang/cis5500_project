@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Card, CardContent, CardMedia,
-  Typography, Rating, Box
-} from '@mui/material';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import Rating from '@mui/material/Rating';
+import Box from '@mui/material/Box';
 import { Link } from 'react-router-dom';
 
 const DEFAULT_IMAGE = "https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg";
