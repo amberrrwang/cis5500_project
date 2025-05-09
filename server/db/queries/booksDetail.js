@@ -72,7 +72,8 @@ async function getReviewsByTitle(title) {
     SELECT review_id, price, review_score, review_summary,
            review_text, review_helpfulness, review_time
     FROM public.book_reviews
-    WHERE title = $1;
+    WHERE title = $1
+    LIMIT 250;
   `, [title]);
   return result.rows;
 }

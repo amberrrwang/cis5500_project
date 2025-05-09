@@ -10,6 +10,8 @@ const app = express();
 // which will be used to parse the request body and handle CORS (security)
 app.use(cors({
   origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.use(bodyParser.json());
