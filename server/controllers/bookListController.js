@@ -90,7 +90,10 @@ const deleteBookList = async (req, res) => {
 // Filter book lists by user/activity/date
 const getFilteredBookLists = async (req, res) => {
   try {
-    const result = await booklistQueries.getFilteredBookLists(req.query);
+    const user_id = req.user?.user_id;
+    const sort_by = req.query.sort_by;
+
+    const result = await booklistQueries.getFilteredBookLists({ user_id, sort_by });
     res.json(result);
   } catch (err) {
     console.error('Error filtering book lists:', err);

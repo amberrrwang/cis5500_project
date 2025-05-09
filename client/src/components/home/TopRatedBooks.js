@@ -1,12 +1,9 @@
 // src/components/home/TopRatedBooks.jsx
-import React from 'react';
-import {
-  Grid, Card, CardContent, CardMedia,
-  Typography, Rating, Box, CircularProgress
-} from '@mui/material';
-import { Link } from 'react-router-dom';
+import React, { forwardRef } from 'react';
+import { Grid, Box, Typography, CircularProgress } from '@mui/material';
+import BookCard from '../../components/BookCard';
 
-export default function TopRatedBooks({ books, loading, scrollable = false }) {
+const TopRatedBooks = forwardRef(({ books, loading, scrollable = false }, ref) => {
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" my={4}>
@@ -17,6 +14,7 @@ export default function TopRatedBooks({ books, loading, scrollable = false }) {
   if (!books || books.length === 0) {
     return <Typography>No top‑rated books to display.</Typography>;
   }
+
 
   const BookCard = ({ book }) => {
 
@@ -111,7 +109,7 @@ export default function TopRatedBooks({ books, loading, scrollable = false }) {
               size="small"
             />
             <Typography variant="body2" color="text.secondary" ml={1}>
-              {book.average_rating?.toFixed(1) ?? '0.0'} ({book.ratings_count || 0})
+              {book.average_rating?.toFixed(1) ?? '0.0'} ({book.rating_count || 0})
             </Typography>
           </Box>
         </CardContent>
@@ -122,11 +120,27 @@ export default function TopRatedBooks({ books, loading, scrollable = false }) {
   // Scrollable strip
   if (scrollable) {
     return (
-      <>
+      <Box 
+        ref={ref}
+        sx={{ 
+          display: 'flex', 
+          gap: 2, 
+          overflowX: 'auto', 
+          pb: 2,
+          pt: 2,
+          px: 2,
+          mx: -2,
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+      >
         {books.map(book => (
           <BookCard key={book.title} book={book} />
         ))}
-      </>
+      </Box>
     );
   }
 
@@ -140,4 +154,8 @@ export default function TopRatedBooks({ books, loading, scrollable = false }) {
       ))}
     </Grid>
   );
-}
+});
+
+TopRatedBooks.displayName = 'TopRatedBooks';
+
+export default TopRatedBooks;

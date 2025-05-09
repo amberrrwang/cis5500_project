@@ -17,10 +17,11 @@ async function getBookListDetail(listId) {
 
     // Get books in the list
     const booksResult = await db.query(`
-      SELECT b.title, b.authors, b.description, b.image
+      SELECT b.title, b.description, b.image, rb.date_added
       FROM reading_list_books rb
       JOIN books_metadata b ON rb.book_title = b.title
       WHERE rb.list_id = $1
+      ORDER BY rb.date_added DESC
     `, [listId]);
 
     const bookList = listResult.rows[0];
@@ -67,17 +68,20 @@ async function removeBookFromList(listId, title) {
 // Edit book list
 async function editBookList(listId, list_name, is_public) {
   try {
-    await db.query(`
+    const result = await db.query(`
       UPDATE reading_lists
       SET list_name = COALESCE($2, list_name),
           is_public = COALESCE($3, is_public)
       WHERE list_id = $1
+      RETURNING *;
     `, [listId, list_name, is_public]);
+    return result.rows[0]; 
   } catch (err) {
     console.error('Error editing book list:', err);
     throw new Error('Database query failed');
   }
 }
+
 
 // Get filtered book lists
 async function getFilteredBookLists({ user_id, sort_by }) {

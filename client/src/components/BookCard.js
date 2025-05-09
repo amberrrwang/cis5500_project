@@ -1,13 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Rating from '@mui/material/Rating';
-import Box from '@mui/material/Box';
+import {
+  Card, CardContent, CardMedia,
+  Typography, Rating, Box
+} from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const DEFAULT_IMAGE = "https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg";
 
@@ -17,101 +14,107 @@ export default function BookCard({ book, onAdd }) {
     if (onAdd) onAdd(book);
   };
 
-  // Robust author parsing
-  let authors = 'Unknown';
-  try {
-    authors = Array.isArray(book.authors)
-      ? book.authors.join(', ')
-      : JSON.parse(book.authors)?.join(', ') || String(book.authors);
-  } catch {
-    authors = String(book.authors).replace(/[\[\]']/g, '');
-  }
-
   return (
     <Card
       sx={{
-        width: 220,
-        height: 400,
+        width: 200,
+        minWidth: 200,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
+        transition: 'all 0.3s ease-in-out',
+        margin: '4px',
+        position: 'relative',
+        '&:hover': {
+          transform: 'scale(1.03)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+          zIndex: 2
+        }
       }}
     >
-      <CardMedia
-        component="img"
+      {/* Cover */}
+      <Box
+        component={Link}
+        to={`/books/${encodeURIComponent(book.title)}`}
         sx={{
-          height: 250,
-          objectFit: 'contain',
-          padding: 1,
-          backgroundColor: '#f9f9f9',
-        }}
-        image={book.image?.trim() || DEFAULT_IMAGE}
-        alt={book.title || 'No title available'}
-        onError={(e) => {
-          e.target.onerror = null;
-          e.target.src = DEFAULT_IMAGE;
-        }}
-      />
-
-      <CardContent
-        sx={{
-          flexGrow: 1,
+          textDecoration: 'none',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          overflow: 'hidden',
+          justifyContent: 'center',
+          p: 1
         }}
       >
-        {/* Top: Title + Author */}
-        <Box sx={{ mb: 1 }}>
-          <Typography
-            variant="h6"
-            component="div"
-            noWrap
+        <Box
+          sx={{
+            height: 240,
+            width: 160,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <CardMedia
+            component="img"
+            image={book.image || DEFAULT_IMAGE}
+            alt={book.title}
             sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              fontSize: '1rem',
-              fontWeight: 600,
-              lineHeight: 1.2,
+              height: '100%',
+              objectFit: 'contain',
+              maxWidth: '100%'
             }}
-            title={book.title}
-          >
-            {book.title || 'Untitled'}
-          </Typography>
-
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            noWrap
-            title={authors}
-          >
-            {authors}
-          </Typography>
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = DEFAULT_IMAGE;
+            }}
+          />
         </Box>
+      </Box>
 
-        {/* Bottom: Rating */}
-        <Box>
+      {/* Content */}
+      <CardContent sx={{ flexGrow: 1, p: 1.5 }}>
+        {/* Title */}
+        <Typography
+          gutterBottom
+          variant="subtitle1"
+          component={Link}
+          to={`/books/${encodeURIComponent(book.title)}`}
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            height: '48px',
+            color: 'inherit',
+            textDecoration: 'none',
+            '&:hover': { color: 'primary.main' }
+          }}
+        >
+          {book.title || 'Untitled'}
+        </Typography>
+
+        {/* Publisher */}
+        {book.publisher && (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: 'block', mt: 0.5 }}
+          >
+            {book.publisher}
+          </Typography>
+        )}
+
+        {/* Rating */}
+        <Box display="flex" alignItems="center" mt={1}>
           <Rating
-            name="average-rating"
             value={Number(book.average_rating) || 0}
             precision={0.5}
             readOnly
             size="small"
-            sx={{ mb: 0.2 }}
           />
-          <Typography variant="caption" color="text.secondary">
-            {book.average_rating ? `${book.average_rating} / 5` : 'No ratings'}
+          <Typography variant="body2" color="text.secondary" ml={1}>
+            {book.average_rating?.toFixed(1) ?? '0.0'} ({book.rating_count || 0})
           </Typography>
         </Box>
       </CardContent>
-
-      <CardActions sx={{ justifyContent: 'center' }}>
-        <Button size="small" variant="contained" onClick={handleAddToList}>
-          Add to List
-        </Button>
-      </CardActions>
     </Card>
   );
 }
@@ -120,9 +123,10 @@ export default function BookCard({ book, onAdd }) {
 BookCard.propTypes = {
   book: PropTypes.shape({
     title: PropTypes.string,
-    authors: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string]),
     image: PropTypes.string,
+    publisher: PropTypes.string,
     average_rating: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    rating_count: PropTypes.number,
   }).isRequired,
   onAdd: PropTypes.func,
 };

@@ -167,8 +167,8 @@ export default function HomePage() {
               left: 0,
               top: '50%',
               transform: 'translateY(-50%)',
-              zIndex: 1,
-              backgroundColor: 'rgba(255,255,255,0.9)',
+              zIndex: 2,
+              backgroundColor: 'white',
               boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
               '&:hover': {
                 backgroundColor: 'white',
@@ -182,26 +182,20 @@ export default function HomePage() {
 
           {/* Scrollable container */}
           <Box
-            ref={featuredRef}
             sx={{
               display: 'flex',
               overflowX: 'auto',
-              px: 6,
+              px: 4,
               py: 2,
+              mx: 2,
               '&::-webkit-scrollbar': {
                 display: 'none'
               },
               scrollbarWidth: 'none',
-              '-ms-overflow-style': 'none',
-              '& > *': {
-                transition: 'transform 0.2s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
-                }
-              }
+              '-ms-overflow-style': 'none'
             }}
           >
-            <FeaturedBooks books={featuredBooks} loading={loading} scrollable={true} />
+            <FeaturedBooks ref={featuredRef} books={featuredBooks} loading={loading} scrollable={true} />
           </Box>
 
           {/* Right scroll button */}
@@ -212,8 +206,8 @@ export default function HomePage() {
               right: 0,
               top: '50%',
               transform: 'translateY(-50%)',
-              zIndex: 1,
-              backgroundColor: 'rgba(255,255,255,0.9)',
+              zIndex: 2,
+              backgroundColor: 'white',
               boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
               '&:hover': {
                 backgroundColor: 'white',
@@ -267,8 +261,8 @@ export default function HomePage() {
               left: 0,
               top: '50%',
               transform: 'translateY(-50%)',
-              zIndex: 1,
-              backgroundColor: 'rgba(255,255,255,0.9)',
+              zIndex: 2,
+              backgroundColor: 'white',
               boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
               '&:hover': {
                 backgroundColor: 'white',
@@ -282,26 +276,20 @@ export default function HomePage() {
 
           {/* Scrollable container */}
           <Box
-            ref={topRatedRef}
             sx={{
               display: 'flex',
               overflowX: 'auto',
-              px: 6,
+              px: 4,
               py: 2,
+              mx: 2,
               '&::-webkit-scrollbar': {
                 display: 'none'
               },
               scrollbarWidth: 'none',
-              '-ms-overflow-style': 'none',
-              '& > *': {
-                transition: 'transform 0.2s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
-                }
-              }
+              '-ms-overflow-style': 'none'
             }}
           >
-            <TopRatedBooks books={topRatedBooks} loading={loading} scrollable={true} />
+            <TopRatedBooks ref={topRatedRef} books={topRatedBooks} loading={loading} scrollable={true} />
           </Box>
 
           {/* Right scroll button */}
@@ -312,8 +300,8 @@ export default function HomePage() {
               right: 0,
               top: '50%',
               transform: 'translateY(-50%)',
-              zIndex: 1,
-              backgroundColor: 'rgba(255,255,255,0.9)',
+              zIndex: 2,
+              backgroundColor: 'white',
               boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
               '&:hover': {
                 backgroundColor: 'white',

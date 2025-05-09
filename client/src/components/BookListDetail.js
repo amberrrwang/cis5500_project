@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Link as RouterLink, useParams } from 'react-router-dom';
 import axios from 'axios';
 import {
   Box, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemButton,
@@ -11,25 +11,33 @@ import AddIcon from '@mui/icons-material/Add';
 
 const DEFAULT_IMAGE = 'https://www.hachette.co.nz/graphics/CoverNotAvailable.jpg';
 
-export default function BookListDetail({ listId }) {
+export default function BookListDetail() {
+  const { id: listId } = useParams();
   const [bookList, setBookList] = useState(null);
   const [editName, setEditName] = useState('');
   const [showEdit, setShowEdit] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newBook, setNewBook] = useState({ title: '', authors: '' });
   const [error, setError] = useState(null);
+  const [filterText, setFilterText] = useState('');
+  const [sortByDate, setSortByDate] = useState(false);
+  const token = localStorage.getItem('authToken');
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/booklists/${listId}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then(res => setBookList(res.data))
       .catch(err => {
         console.error('Error fetching list:', err);
         setError('Failed to load the book list. Please try again later.');
       });
-  }, [listId]);
+  }, [listId, token]);
 
   const handleDelete = (title) => {
-    axios.delete(`http://localhost:8080/booklists/${listId}/books/${encodeURIComponent(title)}`)
+    axios.delete(`${process.env.REACT_APP_API_URL}/booklists/${listId}/books/${encodeURIComponent(title)}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then(() => {
         setBookList(prev => ({
           ...prev,
@@ -43,14 +51,16 @@ export default function BookListDetail({ listId }) {
   };
 
   const handleAddBook = () => {
-    axios.post(`http://localhost:8080/booklists/${listId}/books`, newBook)
+    axios.post(`${process.env.REACT_APP_API_URL}/booklists/${listId}/books`, newBook, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then(() => {
         setBookList(prev => ({
           ...prev,
           books: [...prev.books, newBook]
         }));
         setShowAddDialog(false);
-        setNewBook({ title: '', authors: ''});
+        setNewBook({ title: '', authors: '' });
       })
       .catch(err => {
         console.error('Error adding book:', err);
@@ -59,7 +69,9 @@ export default function BookListDetail({ listId }) {
   };
 
   const saveEdit = () => {
-    axios.put(`http://localhost:8080/booklists/${listId}`, { list_name: editName })
+    axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { list_name: editName }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then(() => {
         setBookList(prev => ({ ...prev, list_name: editName }));
         setShowEdit(false);
@@ -72,7 +84,9 @@ export default function BookListDetail({ listId }) {
 
   const toggleVisibility = () => {
     const newStatus = !bookList.is_public;
-    axios.put(`http://localhost:8080/booklists/${listId}`, { is_public: newStatus })
+    axios.put(`${process.env.REACT_APP_API_URL}/booklists/${listId}`, { is_public: newStatus }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then(() => {
         setBookList(prev => ({ ...prev, is_public: newStatus }));
       })
@@ -82,41 +96,46 @@ export default function BookListDetail({ listId }) {
       });
   };
 
-  if (!bookList) return <div>Loading...</div>;
+  const filteredBooks = useMemo(() => {
+    if (!bookList?.books) return [];
+    return filterText.trim()
+      ? bookList.books.filter(b => b.title.toLowerCase().includes(filterText.toLowerCase()))
+      : bookList.books;
+  }, [bookList, filterText]);
+
+  const sortedBooks = useMemo(() => {
+    return sortByDate
+      ? [...filteredBooks].sort((a, b) => new Date(b.date_added) - new Date(a.date_added))
+      : filteredBooks;
+  }, [filteredBooks, sortByDate]);
 
   const renderRow = ({ index, style }) => {
-    const book = bookList.books[index];
+    const book = sortedBooks[index];
     return (
       <ListItem
         style={style}
         key={book.title}
         secondaryAction={
-          <IconButton edge="end" onClick={() => handleDelete(book.title)}>
+          <IconButton
+            edge="end"
+            onClick={(e) => {
+              e.stopPropagation(); // prevents click from bubbling to navigation
+              handleDelete(book.title);
+            }}
+          >
             <DeleteIcon />
           </IconButton>
         }
         disablePadding
-        component={RouterLink}
-        to={`/books/${encodeURIComponent(book.title)}`}
       >
-        <ListItemButton>
+        <ListItemButton
+          component={RouterLink}
+          to={`/books/${encodeURIComponent(book.title)}`}
+        >
           <ListItemAvatar>
             <Avatar variant="square" src={book.image || DEFAULT_IMAGE} />
           </ListItemAvatar>
-          <ListItemText
-            primary={book.title}
-            secondary={
-              <>
-                <Typography component="span" variant="body2" color="text.primary">
-                  {book.authors}
-                </Typography>
-                <br />
-                <Typography component="span" variant="body2" color="text.secondary">
-                  {book.description || 'No description available.'}
-                </Typography>
-              </>
-            }
-          />
+          <ListItemText primary={book.title} />
         </ListItemButton>
       </ListItem>
     );
@@ -141,6 +160,9 @@ export default function BookListDetail({ listId }) {
           <Typography variant="subtitle2">
             Created by {bookList.username} · {bookList.is_public ? 'Public' : 'Private'}
           </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Created on {new Date(bookList.created_date).toLocaleDateString()}
+          </Typography>
           <Button size="small" variant="outlined" onClick={toggleVisibility}>
             {bookList.is_public ? 'Make Private' : 'Make Public'}
           </Button>
@@ -149,12 +171,33 @@ export default function BookListDetail({ listId }) {
           </Button>
         </Box>
 
+        {/* Filter Input */}
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            label="Filter by Title"
+            variant="outlined"
+            fullWidth
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+          />
+        </Box>
+
+        {/* Sort Button */}
+        <Button
+          variant={sortByDate ? 'contained' : 'outlined'}
+          size="small"
+          onClick={() => setSortByDate(prev => !prev)}
+          sx={{ mb: 2 }}
+        >
+          {sortByDate ? 'Sorted by Date Added' : 'Sort by Date Added'}
+        </Button>
+
         {/* Book List */}
         <FixedSizeList
           height={400}
           width={600}
           itemSize={72}
-          itemCount={bookList.books.length}
+          itemCount={sortedBooks.length}
           overscanCount={5}
         >
           {renderRow}

@@ -1,13 +1,14 @@
 const { pool } = require('../db/index');
 
 // GET /api/books/top-rated
-// Returns the top-rated books by descending average_rating.
+// Returns the top-rated books by descending average_rating, requiring significant number of reviews.
 const getTopBooks = async function (req, res) {
   try {
     const { rows } = await pool.query(`
           SELECT title, image, average_rating, rating_count
           FROM books_metadata
-          WHERE rating_count > 0 AND image IS NOT NULL
+          WHERE rating_count > 1000 
+            AND image IS NOT NULL
           ORDER BY average_rating DESC
           LIMIT 10
         `);
@@ -17,6 +18,7 @@ const getTopBooks = async function (req, res) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 }
+
 
 /**
  * GET /api/books/rankings
@@ -49,3 +51,4 @@ const bookRanking = async function (req, res) {
 };
 
 module.exports = { getTopBooks, bookRanking };
+

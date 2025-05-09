@@ -10,13 +10,19 @@ export default function AllBookListsPage() {
   const [sortBy, setSortBy] = useState('recent');
 
   const fetchLists = () => {
-    let url = `http://localhost:8080/booklists?sort_by=${sortBy}`;
+    let url = `${process.env.REACT_APP_API_URL}/booklists?sort_by=${sortBy}`;
     if (userFilter) url += `&user_id=${userFilter}`;
-
-    axios.get(url)
-      .then(res => setLists(res.data))
-      .catch(err => console.error('❌ Failed to fetch lists:', err));
-  };
+  
+    const token = localStorage.getItem('authToken'); 
+  
+    axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then(res => setLists(res.data))
+    .catch(err => console.error('❌ Failed to fetch lists:', err));
+  };  
 
   useEffect(() => {
     fetchLists();

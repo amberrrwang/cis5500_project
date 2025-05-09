@@ -3,7 +3,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions, List, ListIt
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import axios from 'axios';
 
-function AddToReadingListButton({ bookId }) {
+function AddToReadingListButton({ book }) {
   const [open, setOpen] = useState(false);
   const [readingLists, setReadingLists] = useState([]);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
@@ -15,7 +15,7 @@ function AddToReadingListButton({ bookId }) {
     try {
       // Fetch the user's reading lists from the server
       const token = localStorage.getItem('authToken');
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/reading-list`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/booklists`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -39,21 +39,24 @@ function AddToReadingListButton({ bookId }) {
 
   const handleAddToList = async (listId) => {
     try {
-      // Add the book to the selected reading list
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/reading-list`, {
-        listId,
-        bookId,
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/booklists/${listId}/books`,
+        {
+          title: book.title,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          },
+        }
+      );
       setSuccessSnackbar(true);
     } catch (error) {
       console.error('Failed to add book to list', error);
     }
     handleClose();
   };
+  
 
   const handleAlertClose = () => setShowLoginAlert(false);
   const handleSuccessClose = () => setSuccessSnackbar(false);
@@ -85,8 +88,8 @@ function AddToReadingListButton({ bookId }) {
           <List>
             {readingLists.map((list) => (
               <ListItem key={list.id} disablePadding>
-                <ListItemButton onClick={() => handleAddToList(list.id)}>
-                  <ListItemText primary={list.name} />
+                <ListItemButton onClick={() => handleAddToList(list.list_id)}>
+                  <ListItemText primary={list.list_name} />
                 </ListItemButton>
               </ListItem>
             ))}

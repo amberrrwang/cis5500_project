@@ -65,7 +65,7 @@ app.get('/rankings', bookRanking);
 
 // booklist
 const bookListRoutes = require('./routes/booklists');
-app.use('/booklists', bookListRoutes);
+app.use('/booklists',verifyToken, bookListRoutes);
 
 
 const HOST = process.env.SERVER_HOST || 'localhost';
