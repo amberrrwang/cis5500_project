@@ -8,11 +8,17 @@ const app = express();
 
 //this is the middleware for the express server, 
 // which will be used to parse the request body and handle CORS (security)
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+
+const secureCors = cors({
+  origin: (o, cb) => cb(null, true), 
+  credentials: true,          
+  methods:  ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','X-Requested-With','Accept']
+});
+
+app.use(secureCors);
+
+
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
@@ -58,9 +64,9 @@ app.delete('/reading-list/:listId', verifyToken, reading.deleteReadingList);
 
 
 //home page
-const { getFeaturedBooks, allFeaturedBooks } = require('./routes/featuredBook');
-app.get('/featured-books', getFeaturedBooks);
-app.get('/featured', allFeaturedBooks);
+const { getFeaturedBooks, allFeaturedBooks } = require('./routes/featuredBook'); 
+app.get('/featured-books',  getFeaturedBooks);
+app.get('/featured',  allFeaturedBooks);
 const { getTopBooks, bookRanking } = require('./routes/topBook');
 app.get('/top-rated-books', getTopBooks);
 app.get('/rankings', bookRanking);
