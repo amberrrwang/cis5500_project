@@ -2,7 +2,7 @@
 Check out our website at: [Here!](http://34.204.225.211:8080/)
 ## Project Description
 
-BookVerse aims to solve the problem of book discovery in the digital age. With millions of books available, readers struggle to find their next great read that matches their preferences. Our application bridges this gap by combining comprehensive book metadata from the isbndb-full-database with authentic user reviews from Amazon Books Reviews. This creates a powerful search engine that helps users discover books based on reviews and ratings of like-minded individuals. Additionally, BookVerse provides valuable insights to authors and publishers about reader preferences and market trends.
+BookVerse aims to solve the problem of book discovery in the digital age. With millions of books available, readers struggle to find their next great read that matches their preferences. Our application bridges this gap by combining comprehensive book metadata from the isbndb-full-database with authentic user reviews from Amazon Books Reviews. This creates a powerful search engine that helps users discover books based on reviews and ratings of like-minded individuals. Additionally, BookVerse provides valuable insights to authors and publishers about reader preferences and market trends. This project was developed as part of the CIS5500 (Database and Information Systems) course at the University of Pennsylvania. 
 
 ## Datasets
 
